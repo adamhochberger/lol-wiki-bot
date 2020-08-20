@@ -62,6 +62,31 @@ function fixSpecialCharacters(name) {
 function findChamp(name) {
     return champ_names.includes(name);
 }
+function convertAbbreviation(name) {
+
+    let abbrev = {
+        "Yi": "Master_Yi",
+        "masteryi": "Master_Yi",
+        "lee": "Lee_Sin",
+        "leesin": "Lee_Sin",
+        "mf": "Miss_Fortune",
+        "missfortune": "Miss_Fortune",
+        "vlad": "Vladimir",
+        "blitz": "Blitzcrank",
+        "kench": "Tahm_Kench",
+        "trynd": "Tryndamere",
+        "ez": "Ezreal",
+        "cait": "Caitlyn",
+    }
+
+    if(name in abbrev) {
+        return abbrev[name];
+    }
+    else {
+        return name;
+    }
+}
+
 client.on('ready', () => {
 
     console.log('Logged in as ' + client.user["username"] + '!');
@@ -86,4 +111,4 @@ client.on('message', msg  => {
     }
 });
 
-// client.login([token])
+client.login('NzQ2MDQ2ODU3NTk1MzIyNDc5.Xz6oRw.AIndVS-TgJ5cBLZbiM9zKpqHCvQ')
