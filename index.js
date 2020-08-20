@@ -1,3 +1,4 @@
+const auth = require('./auth.json')
 const Discord = require('discord.js');
 const client = new Discord.Client();
 
@@ -95,7 +96,7 @@ client.on('ready', () => {
 client.on('message', msg  => {
     if(msg.content.length > 4) {
         if(msg.content.substring(0, 4) === '!lol') {
-            let name = convertAbbrevation(msg.content.substring(5, msg.content.length));
+            let name = convertAbbreviation(msg.content.substring(5, msg.content.length));
             name = fixSpecialCharacters(name.toUpperCase());
             if (findChamp(name) === true) {
                 msg.channel.send("https://leagueoflegends.fandom.com/wiki/" + name);
@@ -111,4 +112,4 @@ client.on('message', msg  => {
     }
 });
 
-//client.login([key])
+client.login(auth.token)
