@@ -111,4 +111,4 @@ client.on('message', msg  => {
     }
 });
 
-client.login('NzQ2MDQ2ODU3NTk1MzIyNDc5.Xz6oRw.AIndVS-TgJ5cBLZbiM9zKpqHCvQ')
+//client.login([key])
