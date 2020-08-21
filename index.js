@@ -98,18 +98,37 @@ function parsePage(url) {
         const $ = cheerio.load(response.body);
 
                 $('.ability-info-container').each(function(i, e) {
-                    console.log($(this).attr('id') + "\n");
+                    console.log($(this).attr('id'));
                     $(this).find('table').each(function(i,e) {
                         $(this).find('p').each(function(i,e) {
-                            //console.log($(this).children() + "\n");
-
-                            //TODO: Remove image elements from text printing
-                            console.log($(this).text() + "\n");
+                            let text = $(this).text();
+                            while(text.indexOf('<') >=0) {
+                                text = text.substring(0, text.indexOf('<')-1) + text.substring(text.indexOf('>')+1, text.length);
+                            }
+                            console.log(text.substring(0, text.length-1));
+                            
+                            
                         });
                         $(this).find('.skill_leveling').each(function(i,e) {
-                            console.log($(this).text() + "\n");
+                            let text = $(this).text();
+                            while(text.indexOf('<') >=0) {
+                                text = text.substring(0, text.indexOf('<')-1) + text.substring(text.indexOf('>')+1, text.length);
+                            }
+                            console.log(text.substring(1, text.length));
                         });
+
+                        //TODO: Get elements printed correctly for skill-tabs class with elements dt, dd
+                        /*$(this).find('.skill-tabs').each(function(i,e) {
+                            let text = $(this).text();
+                            while(text.indexOf('<') >=0) {
+                                text = text.substring(0, text.indexOf('<')-1) + text.substring(text.indexOf('>')+1, text.length);
+                            }
+                            console.log(text.substring(0, text.length) + "\n");
+
+                        });
+                        */
                     });
+                    console.log("\n");
                 });
     }).catch(err => {
         console.log(err);
