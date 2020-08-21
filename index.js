@@ -95,10 +95,21 @@ function convertAbbreviation(name) {
 
 function parsePage(url) {
     got(url).then(response => {
-        const page = cheerio.load(response.body);
+        const $ = cheerio.load(response.body);
 
-                page('.ability-info').each(function(i, e) {
-                    console.log(page(this).find('span:first') + "\n");
+                $('.ability-info-container').each(function(i, e) {
+                    console.log($(this).attr('id') + "\n");
+                    $(this).find('table').each(function(i,e) {
+                        $(this).find('p').each(function(i,e) {
+                            //console.log($(this).children() + "\n");
+
+                            //TODO: Remove image elements from text printing
+                            console.log($(this).text() + "\n");
+                        });
+                        $(this).find('.skill_leveling').each(function(i,e) {
+                            console.log($(this).text() + "\n");
+                        });
+                    });
                 });
     }).catch(err => {
         console.log(err);
