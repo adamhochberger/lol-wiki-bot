@@ -1,0 +1,29 @@
+{
+  "name": "lol-wiki-bot",
+  "version": "1.0.0",
+  "description": "## Discord bot for pulling League of Legends information from FANDOM Wiki",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/adamhochberger/lol-wiki-bot.git"
+  },
+  "keywords": [],
+  "author": {
+    "email": "adamhochberger@gmail.com",
+    "name": "adam_hochberger"
+  },
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/adamhochberger/lol-wiki-bot/issues"
+  },
+  "dependencies": {
+    "cheerio": "1.0.0-rc.3",
+    "discord.js": "12.3.1",
+    "fs": "0.0.1-security",
+    "got": "10.4.0"
+  },
+  "homepage": "https://github.com/adamhochberger/lol-wiki-bot#readme"
+}
