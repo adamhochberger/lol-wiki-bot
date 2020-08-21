@@ -1,6 +1,11 @@
 const auth = require('./auth.json')
 const Discord = require('discord.js');
 const client = new Discord.Client();
+const fs = require('fs');
+const cheerio = require('cheerio');
+const got = require('got');
+const { parse } = require('path');
+
 
 var champ_names =["Aatrox","Ahri","Akali","Alistar","Amumu",
 "Anivia","Annie","Aphelios","Ashe","Aurelion_Sol","Azir","Bard",
@@ -88,6 +93,18 @@ function convertAbbreviation(name) {
     }
 }
 
+function parsePage(url) {
+    got(url).then(response => {
+        const page = cheerio.load(response.body);
+
+                page('.ability-info').each(function(i, e) {
+                    console.log(page(this).find('span:first') + "\n");
+                });
+    }).catch(err => {
+        console.log(err);
+    })
+}
+
 client.on('ready', () => {
 
     console.log('Logged in as ' + client.user["username"] + '!');
@@ -99,7 +116,8 @@ client.on('message', msg  => {
             let name = convertAbbreviation(msg.content.substring(5, msg.content.length));
             name = fixSpecialCharacters(name.toUpperCase());
             if (findChamp(name) === true) {
-                msg.channel.send("https://leagueoflegends.fandom.com/wiki/" + name);
+                parsePage("https://leagueoflegends.fandom.com/wiki/" + name + "/LoL/Gameplay");
+                msg.channel.send("https://leagueoflegends.fandom.com/wiki/" + name + "/LoL/Gameplay");
             }
             else {
                 msg.channel.send('Champion: ' + msg.content.substring(4, msg.content.length) + ' not found');
@@ -111,5 +129,6 @@ client.on('message', msg  => {
         msg.reply('please add the parameters for the command `!lol [champion, rune, item name]`')
     }
 });
+
 
 client.login(auth.token)
