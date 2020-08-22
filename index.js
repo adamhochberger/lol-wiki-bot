@@ -98,7 +98,16 @@ function parsePage(url) {
         const $ = cheerio.load(response.body);
 
                 $('.ability-info-container').each(function(i, e) {
-                    console.log($(this).attr('id'));
+
+                    let name = $(this).attr('id');
+                    while(name.indexOf('_') >=0) {
+                        name = name.replace('_', ' ');
+                    }
+                    if(name.indexOf('.27') >= 0) {
+                        name = name.replace('.27', '\'');
+                    }
+                    console.log(name);
+
                     $(this).find('table').each(function(i,e) {
                         $(this).find('p').each(function(i,e) {
                             let text = $(this).text();
@@ -110,11 +119,27 @@ function parsePage(url) {
                             
                         });
                         $(this).find('.skill_leveling').each(function(i,e) {
-                            let text = $(this).text();
-                            while(text.indexOf('<') >=0) {
-                                text = text.substring(0, text.indexOf('<')-1) + text.substring(text.indexOf('>')+1, text.length);
+
+                            if($(this).find('.skill-tabs').length > 0) {
+                                $(this).find('.skill-tabs').each(function(i,e) {
+                                    $(this).children().each(function(i,e) {
+                                        let text = $(this).text();
+                                        while(text.indexOf('<') >=0) {
+                                            text = text.substring(0, text.indexOf('<')-1) + text.substring(text.indexOf('>')+1, text.length);
+                                        }
+                                        console.log(text.substring(0, text.length));
+                                    });
+                                    console.log("\n");
+                                });
                             }
-                            console.log(text.substring(1, text.length));
+                            else {
+                                let text = $(this).text();
+                                while(text.indexOf('<') >=0) {
+                                    text = text.substring(0, text.indexOf('<')-1) + text.substring(text.indexOf('>')+1, text.length);
+                                }
+                                console.log(text.substring(1, text.length));
+                            }
+                            
                         });
 
                         //TODO: Get elements printed correctly for skill-tabs class with elements dt, dd
