@@ -47,8 +47,6 @@ function lastIndexOfLetter(list, letter) {
     }
     return -1;
 }
-
-
 function fixSpecialCharacters(name) {
     let fixed = name;
     while(fixed.indexOf(' ') >= 0) {
@@ -64,7 +62,6 @@ function fixSpecialCharacters(name) {
     }
     return fixed;
 }
-
 function findChamp(name) {
     return champ_names.includes(name);
 }
@@ -95,69 +92,73 @@ function convertAbbreviation(name) {
 
 function parsePage(url) {
     got(url).then(response => {
+        let result = '';
         const $ = cheerio.load(response.body);
+        $('.ability-info-container').each(function(i, e) {
 
-                $('.ability-info-container').each(function(i, e) {
+            let name = $(this).attr('id');
+            while(name.indexOf('_') >=0) {
+                name = name.replace('_', ' ');
+            }
+            if(name.indexOf('.27') >= 0) {
+                name = name.replace('.27', '\'');
+            }
+            result += name + "\n";
 
-                    let name = $(this).attr('id');
-                    while(name.indexOf('_') >=0) {
-                        name = name.replace('_', ' ');
+            $(this).find('table').each(function(i,e) {
+                $(this).find('p').each(function(i,e) {
+                    let text = $(this).text();
+                    while(text.indexOf('<') >=0) {
+                        text = text.substring(0, text.indexOf('<')-1) + text.substring(text.indexOf('>')+1, text.length);
                     }
-                    if(name.indexOf('.27') >= 0) {
-                        name = name.replace('.27', '\'');
-                    }
-                    console.log(name);
+                    result += text.substring(0, text.length-1) + "\n";
+                    console.log(text.substring(0, text.length-1));
+                    
+                    
+                });
+                $(this).find('.skill_leveling').each(function(i,e) {
 
-                    $(this).find('table').each(function(i,e) {
-                        $(this).find('p').each(function(i,e) {
-                            let text = $(this).text();
-                            while(text.indexOf('<') >=0) {
-                                text = text.substring(0, text.indexOf('<')-1) + text.substring(text.indexOf('>')+1, text.length);
-                            }
-                            console.log(text.substring(0, text.length-1));
-                            
-                            
-                        });
-                        $(this).find('.skill_leveling').each(function(i,e) {
-
-                            if($(this).find('.skill-tabs').length > 0) {
-                                $(this).find('.skill-tabs').each(function(i,e) {
-                                    $(this).children().each(function(i,e) {
-                                        let text = $(this).text();
-                                        while(text.indexOf('<') >=0) {
-                                            text = text.substring(0, text.indexOf('<')-1) + text.substring(text.indexOf('>')+1, text.length);
-                                        }
-                                        console.log(text.substring(0, text.length));
-                                    });
-                                    console.log("\n");
-                                });
-                            }
-                            else {
+                    if($(this).find('.skill-tabs').length > 0) {
+                        $(this).find('.skill-tabs').each(function(i,e) {
+                            $(this).children().each(function(i,e) {
                                 let text = $(this).text();
                                 while(text.indexOf('<') >=0) {
                                     text = text.substring(0, text.indexOf('<')-1) + text.substring(text.indexOf('>')+1, text.length);
                                 }
-                                console.log(text.substring(1, text.length));
-                            }
-                            
+                                console.log(text.substring(0, text.length));
+                                result += text.substring(0, text.length) + "\n";
+                            });
+                            result += "\n";
                         });
-
-                        //TODO: Get elements printed correctly for skill-tabs class with elements dt, dd
-                        /*$(this).find('.skill-tabs').each(function(i,e) {
-                            let text = $(this).text();
-                            while(text.indexOf('<') >=0) {
-                                text = text.substring(0, text.indexOf('<')-1) + text.substring(text.indexOf('>')+1, text.length);
-                            }
-                            console.log(text.substring(0, text.length) + "\n");
-
-                        });
-                        */
-                    });
-                    console.log("\n");
+                    }
+                    else {
+                        let text = $(this).text();
+                        while(text.indexOf('<') >=0) {
+                            text = text.substring(0, text.indexOf('<')-1) + text.substring(text.indexOf('>')+1, text.length);
+                        }
+                        console.log(text.substring(1, text.length));
+                        result += text.substring(1, text.length) + "\n";
+                    }
+                    
                 });
-    }).catch(err => {
-        console.log(err);
-    })
+
+                //TODO: Get elements printed correctly for skill-tabs class with elements dt, dd
+                /*$(this).find('.skill-tabs').each(function(i,e) {
+                    let text = $(this).text();
+                    while(text.indexOf('<') >=0) {
+                        text = text.substring(0, text.indexOf('<')-1) + text.substring(text.indexOf('>')+1, text.length);
+                    }
+                    console.log(text.substring(0, text.length) + "\n");
+
+                });
+                */
+            });
+            result += "\n";
+        });
+
+        return result;
+        
+    });
 }
 
 client.on('ready', () => {
@@ -171,8 +172,12 @@ client.on('message', msg  => {
             let name = convertAbbreviation(msg.content.substring(5, msg.content.length));
             name = fixSpecialCharacters(name.toUpperCase());
             if (findChamp(name) === true) {
+                //let url = "https://leagueoflegends.fandom.com/wiki/" + name + "/LoL/Gameplay";
+                //var champText = parsePage.then(function(result){});
+
                 parsePage("https://leagueoflegends.fandom.com/wiki/" + name + "/LoL/Gameplay");
-                msg.channel.send("https://leagueoflegends.fandom.com/wiki/" + name + "/LoL/Gameplay");
+
+                //msg.channel.send("https://leagueoflegends.fandom.com/wiki/" + name + "/LoL/Gameplay");
             }
             else {
                 msg.channel.send('Champion: ' + msg.content.substring(4, msg.content.length) + ' not found');
