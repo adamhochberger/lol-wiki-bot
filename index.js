@@ -6,6 +6,13 @@ const cheerio = require('cheerio');
 const got = require('got');
 const { parse } = require('path');
 
+var attribute_names = ["Health", "Resource Bar", "Health Regen", "Resource Regen", 
+"Armor", "Attack Damage", "Magic Resist", "Critical Damage", "Movement Speed", "AttackRange",
+]
+
+var attackspeed_attribute_names = ["Attack Speed", "Windup", "AS ratio", "Bonus AS"]
+
+var unit_radius_names = ["Gameplay Radius", "Selection Radius", "Pathing Radius", "Auto Radius"]
 
 var champ_names =["Aatrox","Ahri","Akali","Alistar","Amumu",
 "Anivia","Annie","Aphelios","Ashe","Aurelion_Sol","Azir","Bard",
@@ -91,20 +98,28 @@ function convertAbbreviation(name) {
 }
 
 function parsePage(url) {
-    got(url).then(response => {
-        let result = '';
+    let result = '';
+    return got(url).then(response => {
         const $ = cheerio.load(response.body);
         $('.ability-info-container').each(function(i, e) {
 
             let name = $(this).attr('id');
-            while(name.indexOf('_') >=0) {
-                name = name.replace('_', ' ');
-            }
-            if(name.indexOf('.27') >= 0) {
-                name = name.replace('.27', '\'');
-            }
-            result += name + "\n";
 
+            if(name !== undefined) {
+                while(name.indexOf('_') >=0) {
+                    name = name.replace('_', ' ');
+                }
+                if(name.indexOf('.27') >= 0) {
+                    name = name.replace('.27', '\'');
+                }
+                if(name.indexOf('.2C') >= 0) {
+                    name = name.replace('.2C', ',');
+                }
+                result += name + "\n";
+                console.log(name);
+            }
+
+            
             $(this).find('table').each(function(i,e) {
                 $(this).find('p').each(function(i,e) {
                     let text = $(this).text();
@@ -154,11 +169,16 @@ function parsePage(url) {
                 */
             });
             result += "\n";
+            console.log();
         });
-
-        return result;
-        
+        //return Promise.resolve(result);
+        return new Promise(resolve => {
+             if (result == '') throw new Error("Champion information was not found.");
+             setTimeout(() => resolve(result), 1000);
+        });
+        //return result;
     });
+    
 }
 
 client.on('ready', () => {
@@ -175,7 +195,27 @@ client.on('message', msg  => {
                 //let url = "https://leagueoflegends.fandom.com/wiki/" + name + "/LoL/Gameplay";
                 //var champText = parsePage.then(function(result){});
 
-                parsePage("https://leagueoflegends.fandom.com/wiki/" + name + "/LoL/Gameplay");
+                parsePage("https://leagueoflegends.fandom.com/wiki/" + name + "/LoL/Gameplay").then(value =>{
+                    while(value.length > 2000) {
+                        let size = value.length;
+                        let small_string = value.substring(0, 1999);
+                        let ending = small_string.lastIndexOf('\n');
+                        small_string = value.substring(0, ending);
+                        msg.channel.send(small_string);
+                        value = value.substring(ending, size);
+
+                        // msg.channel.send(small_string).then(result => {
+                        //     console.log(value);
+                        //     value = value.substring(2000, size);
+                        // }).catch(error => {
+                        //     console.log(error);
+                        // });
+                        
+                    }
+                    msg.channel.send(value);
+                }).catch(error => {
+                    console.log(error);
+                });
 
                 //msg.channel.send("https://leagueoflegends.fandom.com/wiki/" + name + "/LoL/Gameplay");
             }
