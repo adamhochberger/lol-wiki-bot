@@ -84,7 +84,26 @@ function convertAbbreviation(name) {
     }
 }
 
-function parseAbilities(url) {
+//Visits corresponding url and prints stats for the rune along with description
+//TODO: Implement functionality for returning rune stats/description
+function parseRune(url) {
+    return null;
+}
+
+//Visits corresponding url and prints stats for the item along with description
+//TODO: Implement functionality for returning item stats
+function parseItem(url) {
+    //Will display the item passive, attributes, icon potentially, and gold efficiency
+    return null;
+}
+
+
+//Visits corresponding url and prints stats (base, level up) for the champion
+//TODO: Implement functionality, stat searching
+function parseStats(url, statType) {
+    return null;
+}
+
 //Visits corresponding url and prints passive + ability data for the given champion
 //TODO: Implement search by specific ability (q, w, e, r ,passive)
 function parseAbilities(url, abilityType) {
