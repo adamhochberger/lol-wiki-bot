@@ -97,7 +97,7 @@ function convertAbbreviation(name) {
     }
 }
 
-function parsePage(url) {
+function parseAbilities(url) {
     let result = '';
     return got(url).then(response => {
         const $ = cheerio.load(response.body);
@@ -109,11 +109,14 @@ function parsePage(url) {
                 while(name.indexOf('_') >=0) {
                     name = name.replace('_', ' ');
                 }
-                if(name.indexOf('.27') >= 0) {
+                while(name.indexOf('.27') >= 0) {
                     name = name.replace('.27', '\'');
                 }
-                if(name.indexOf('.2C') >= 0) {
+                while(name.indexOf('.2C') >= 0) {
                     name = name.replace('.2C', ',');
+                }
+                while(name.indexOf('.21') >= 0) {
+                    name = name.replace('.21', '!');
                 }
                 result += name + "\n";
                 console.log(name);
@@ -193,9 +196,9 @@ client.on('message', msg  => {
             name = fixSpecialCharacters(name.toUpperCase());
             if (findChamp(name) === true) {
                 //let url = "https://leagueoflegends.fandom.com/wiki/" + name + "/LoL/Gameplay";
-                //var champText = parsePage.then(function(result){});
+                //var champText = parseAbilities.then(function(result){});
 
-                parsePage("https://leagueoflegends.fandom.com/wiki/" + name + "/LoL/Gameplay").then(value =>{
+                parseAbilities("https://leagueoflegends.fandom.com/wiki/" + name + "/LoL/Gameplay").then(value =>{
                     while(value.length > 2000) {
                         let size = value.length;
                         let small_string = value.substring(0, 1999);
