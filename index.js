@@ -118,6 +118,10 @@ function parseAbilities(url, abilityType) {
         let suffix = ''
         if(skill !== '') {suffix = '_' + skill;}
 
+        if(url.includes('Aphelios') && (suffix === '_q' || suffix === '_w')){
+            suffix = '_aphelios';
+        }
+
         //For-each loop that iterates over reach ability on the page (only one if suffix is not blank or '')
         $('.skill' + suffix).each(function(i,e) {
 
@@ -216,6 +220,7 @@ function parseAbilities(url, abilityType) {
                 result += "\n";
                 //console.log();
             });
+
         });
     
 
