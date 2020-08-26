@@ -198,8 +198,18 @@ client.on('ready', () => {
 });
 
 client.on('message', msg  => {
-    if(msg.content.length > 4) {
-        if(msg.content.substring(0, 4) === '!lol') {
+
+    if(!msg.content.startsWith("!") || msg.author.bot) return;
+
+
+    const args = msg.content.slice(1).trim().split(/ +/);
+    const command = args.shift().toLowerCase();
+
+    // Checks if command is for champion
+    // TODO: Implement item, rune
+    if (command === 'champ') {
+        if(!args.length) {
+            return msg.channel.send('Please add the parameters for the command `!lol [champion, rune, item name]`');
             
             //TODO: Implement item searching
             //TODO: Separate functions for ability and item parsing
@@ -247,15 +257,17 @@ client.on('message', msg  => {
 
         //Error checking in the even the champion is not found
         else {
-                msg.channel.send('Champion: ' + msg.content.substring(4, msg.content.length) + ' not found');
+            msg.channel.send('Champion: ' + name + ' not found');
+        }
     }
+    else if (command === "item") {
 
     }
-    }
+    else if (command === "rune") {
 
-    //Reports to user that input is invalid and how that can be fixed
-    else if (msg.content === '!lol') {
-        msg.reply('please add the parameters for the command `!lol [champion, rune, item name]`')
+    }
+    else {
+        msg.channel.send("\"!" + command + "\"" + " is not a valid command.");
     }
 });
 
