@@ -94,7 +94,61 @@ function parseItem(url) {
 //Visits corresponding url and prints stats (base, level up) for the champion
 //TODO: Implement functionality, stat searching
 function parseStats(url, statType) {
-    return null;
+    return got(url).then(response => {
+
+        let result = '';
+        const $ = cheerio.load(response.body);
+        $('.pi-theme-stats-table').each(function(i,e) {
+            if(i === 0) {
+                result += "**Base statistics**\n";
+                $(this).find('.pi-group').each(function(i,e) {
+                    if(i!==0) {
+                        let header = '';
+                        if($(this).find('a').length === 0){header = $(this).find('h2').text();}
+                        else {header = $(this).find('a').attr('title');}
+                        
+                        while(header.indexOf('<') >=0) {
+                            header = header.substring(0, header.indexOf('<')-1) + header.substring(header.indexOf('>')+1, header.length);
+                        }
+                        result += "\n**"+header+"**\n";
+                    }
+                    let names = [];
+                    if($(this).find(".pi-section-label").length>0) {
+                        $(this).find(".pi-section-label").each(function(i,e) {
+                            names[i] = $(this).text().trim();
+                        });
+                    }
+                    
+                    $(this).find("[data-source]").each(function(i,e) {
+
+                        if (names.length > 0) {
+                            if(i===0) {result += names[0] + "\n";}
+                            else if(i%4===0) {result += "\n" + names[i/4] + "\n";}
+                        }
+                        let text = $(this).text();
+    
+                        while(text.indexOf('<') >=0) {
+                            text = text.substring(0, text.indexOf('<')-1) + text.substring(text.indexOf('>')+1, text.length);
+                        }
+                        text = text.trim();
+
+                        let firstCharacter = text.search(/([0-9]|-|\.([0-9]?\w?)[1]|\+)/);
+                        let numberPlus = text.search(/[0-9]\+[0-9]/);
+                        if(numberPlus > 0) {text = text.replace("+", " + ");}
+                        if(text.includes("N/A")) { text = text.replace("N/A", ": N/A");} 
+                        else {text = text.substring(0, firstCharacter) + ": " + text.substring(firstCharacter); + "3"}
+                        result += text + "\n";
+                    });
+
+                    if(i===3) {return false;}
+                });
+            }
+        });
+        return new Promise(resolve => {
+            if (result === '') throw new Error("Champion stats was not found.");
+            setTimeout(() => resolve(result), 1000);
+       });
+    });
 }
 
 //Visits corresponding url and prints passive + ability data for the given champion
@@ -247,7 +301,7 @@ client.on('message', msg  => {
 
     // Checks if command is for champion
     // TODO: Implement item, rune functionality
-    if(command === 'champ') {
+    if(command === 'champ' || command === 'stats') {
         
         //Check if arguments list is empty
         if(!args.length) {
@@ -264,7 +318,7 @@ client.on('message', msg  => {
 
         //Sets value of parameter if the last argument is of size 1 (for ability selection)
         if(args[args.length -1].length === 1) { offset = 1; param = args[args.length-1]}
-
+        
         //Builds champion name by adding all array elements - offset (since some champions require spaces)
         let name = '';
         for(i=0; i < args.length - offset; i++) {
@@ -275,22 +329,33 @@ client.on('message', msg  => {
         name = convertAbbreviation(name);
         name = fixSpecialCharacters(name.toUpperCase());
         
-        
+
         if (champ_names.includes(name) === true) {
             //let url = "https://leagueoflegends.fandom.com/wiki/" + name + "/LoL/Gameplay";
-            
+            let result = '';
+            if(command === 'stats') {
+                parseStats("https://leagueoflegends.fandom.com/wiki/" + name + "/LoL/Gameplay", param.toLowerCase()).then(value => {
+                    result = value;
+                    wrapText(result, msg.channel);
+                }).catch(error => {
+                    console.log(error);
+                });
 
-            parseAbilities("https://leagueoflegends.fandom.com/wiki/" + name + "/LoL/Gameplay", param.toLowerCase()).then(value =>{
-
-            wrapText(value, msg.channel);
-                
-            }).catch(error => {
-                console.log(error);
-            });
+            }
+            else{
+                parseAbilities("https://leagueoflegends.fandom.com/wiki/" + name + "/LoL/Gameplay", param.toLowerCase()).then(value =>{
+                    result = value;
+                    wrapText(result, msg.channel);
+                }).catch(error => {
+                    console.log(error);
+                });
+            }
+           
+        }
 
             //Debug message to ensure link worked well
             //msg.channel.send("https://leagueoflegends.fandom.com/wiki/" + name + "/LoL/Gameplay");
-        }
+        
 
         //Error checking in the even the champion is not found
         else {
