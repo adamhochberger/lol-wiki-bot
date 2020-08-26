@@ -75,9 +75,12 @@ function parseStats(url, statType) {
 }
 
 //Visits corresponding url and prints passive + ability data for the given champion
-//TODO: Implement search by specific ability (q, w, e, r ,passive)
+//TODO: Implement search by specific ability (q, w, e, r ,p[assive])
 function parseAbilities(url, abilityType) {
     let result = '';
+    let skill = abilityType;
+
+    if (skill === 'p') { skill = 'innate';}
 
     //Promise for successful query of URl
     return got(url).then(response => {
@@ -85,12 +88,16 @@ function parseAbilities(url, abilityType) {
         //Saves a const that allows for jQuery-like obtaining of page elements
         const $ = cheerio.load(response.body);
 
-        // if(abilityType != "all") {
-        //     $ = $('.skill_' + abilityType);
+        // if($(this).parent('.skill_' + skill)) {
+        //     console.log($('.skill_' + skill).text());
+        //     return;
         // }
+        let suffix = ''
+        if(skill !== '') {suffix = '_' + skill;}
 
+        $('.skill' + suffix).each(function(i,e) {
         //For-each loop that iterates over each ability on the page
-        $('.ability-info-container').each(function(i, e) {
+            $(this).find('.ability-info-container').each(function(i, e) {
 
                 //Sets name to be the id of this attribute
                 let name = $(this).attr('id');
@@ -129,7 +136,7 @@ function parseAbilities(url, abilityType) {
                         result += text.substring(0, text.length) + "\n";
 
                         //Debug console log
-                    console.log(text.substring(0, text.length-1));
+                        //console.log(text.substring(0, text.length-1));
                         
                         
                     });
@@ -156,7 +163,7 @@ function parseAbilities(url, abilityType) {
                                     result += text.substring(0, text.length) + "\n";
 
                                     //Debug console log
-                                console.log(text.substring(0, text.length));
+                                    //console.log(text.substring(0, text.length));
                                 });
 
                                 //Appends newline for formatting
@@ -176,14 +183,17 @@ function parseAbilities(url, abilityType) {
                             result += text.substring(0, text.length) + "\n";
 
                             //Debug console log
-                        console.log(text.substring(0, text.length));
+                            //console.log(text.substring(0, text.length));
                         }
                         
                     });
                 });
                 result += "\n";
-            console.log();
+                //console.log();
             });
+        });
+    
+
         return new Promise(resolve => {
              if (result == '') throw new Error("Champion information was not found.");
              setTimeout(() => resolve(result), 1000);
@@ -211,16 +221,25 @@ client.on('message', msg  => {
         if(!args.length) {
             return msg.channel.send('Please add the parameters for the command `!lol [champion, rune, item name]`');
             
-            //TODO: Implement item searching
-            //TODO: Separate functions for ability and item parsing
+        }
+        offset = 0;
+        param = '';
+        if (args[args.length-1].toLowerCase() === 'passive') {args[args.length-1] = 'p';}
+        if(args[args.length -1].length === 1) { offset = 1; param = args[args.length-1]}
 
-            let name = convertAbbreviation(msg.content.substring(5, msg.content.length));
+        let name = '';
+        for(i=0; i < args.length - offset; i++) {
+            name = name + args[i];
+        }
+        name = convertAbbreviation(name);
         name = fixSpecialCharacters(name.toUpperCase());
-            if (findChamp(name) === true) {
+        
+        
+        if (champ_names.includes(name) === true) {
             //let url = "https://leagueoflegends.fandom.com/wiki/" + name + "/LoL/Gameplay";
             //var champText = parseAbilities.then(function(result){});
 
-                parseAbilities("https://leagueoflegends.fandom.com/wiki/" + name + "/LoL/Gameplay", "all").then(value =>{
+            parseAbilities("https://leagueoflegends.fandom.com/wiki/" + name + "/LoL/Gameplay", param.toLowerCase()).then(value =>{
 
                 //While loop that splits up text if length is >2000 (unable to be sent through Discord)
                 while(value.length > 2000) {
