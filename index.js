@@ -22,11 +22,6 @@ function fixSpecialCharacters(name) {
     return fixed;
 }
 
-//Simple function that is a shell of list.includes function
-function findChamp(name) {
-    return champ_names.includes(name);
-}
-
 //Converts common champion abbreviation to corresponding list entry - more can be added in future
 function convertAbbreviation(name) {
 
@@ -81,6 +76,7 @@ function wrapText(text, channel) {
     //Final print for value which is either all of the input if <2000 or remaining input after other sections
     channel.send(text);
 }
+
 //Visits corresponding url and prints stats for the rune along with description
 //TODO: Implement functionality for returning rune stats/description
 function parseRune(url) {
@@ -102,11 +98,14 @@ function parseStats(url, statType) {
 }
 
 //Visits corresponding url and prints passive + ability data for the given champion
-//TODO: Implement search by specific ability (q, w, e, r ,p[assive])
+//Parameters:
+// urL - the fandom wiki link for the corresponding character or page
+// abilityType - a 1-character long string with the options [p, q, w, e, r] or an empty string
 function parseAbilities(url, abilityType) {
     let result = '';
     let skill = abilityType;
 
+    //Changes the 'p' parameter to innate as that is the syntax required for the page
     if (skill === 'p') { skill = 'innate';}
 
     //Promise for successful query of URl
@@ -115,15 +114,14 @@ function parseAbilities(url, abilityType) {
         //Saves a const that allows for jQuery-like obtaining of page elements
         const $ = cheerio.load(response.body);
 
-        // if($(this).parent('.skill_' + skill)) {
-        //     console.log($('.skill_' + skill).text());
-        //     return;
-        // }
+        //Determines if there should be a suffix appended to the skill class (enables a specific skill to be returned)
         let suffix = ''
         if(skill !== '') {suffix = '_' + skill;}
 
+        //For-each loop that iterates over reach ability on the page (only one if suffix is not blank or '')
         $('.skill' + suffix).each(function(i,e) {
-        //For-each loop that iterates over each ability on the page
+
+        //For-each loop that iterates over the container for the abilities to be searched (all or one)
             $(this).find('.ability-info-container').each(function(i, e) {
 
                 //Sets name to be the id of this attribute
@@ -144,7 +142,7 @@ function parseAbilities(url, abilityType) {
                         name = name.replace('.21', '!');
                     }
                     result += name + "\n";
-                    console.log(name);
+                    //console.log(name);
                 }
 
                 //For-each loop that iterates over each table within the ability 
@@ -243,33 +241,44 @@ client.on('message', msg  => {
     const command = args.shift().toLowerCase();
 
     // Checks if command is for champion
-    // TODO: Implement item, rune
-    if (command === 'champ') {
+    // TODO: Implement item, rune functionality
+    if(command === 'champ') {
+        
+        //Check if arguments list is empty
         if(!args.length) {
             return msg.channel.send('Please add the parameters for the command `!lol [champion, rune, item name]`');
             
         }
+
+        //Values that will be used to check if user wants a specific part of champion abilities
         offset = 0;
         param = '';
-        if (args[args.length-1].toLowerCase() === 'passive') {args[args.length-1] = 'p';}
+
+        //Checks if user has entered 'passive' and changes it to 'p'
+        if(args[args.length-1].toLowerCase() === 'passive') {args[args.length-1] = 'p';}
+
+        //Sets value of parameter if the last argument is of size 1 (for ability selection)
         if(args[args.length -1].length === 1) { offset = 1; param = args[args.length-1]}
 
+        //Builds champion name by adding all array elements - offset (since some champions require spaces)
         let name = '';
         for(i=0; i < args.length - offset; i++) {
             name = name + args[i];
         }
+        
+        //Converts abbreviations and adds '_' and '\'' characters where needed for URl to succeed
         name = convertAbbreviation(name);
         name = fixSpecialCharacters(name.toUpperCase());
         
         
         if (champ_names.includes(name) === true) {
             //let url = "https://leagueoflegends.fandom.com/wiki/" + name + "/LoL/Gameplay";
-            //var champText = parseAbilities.then(function(result){});
+            
 
             parseAbilities("https://leagueoflegends.fandom.com/wiki/" + name + "/LoL/Gameplay", param.toLowerCase()).then(value =>{
 
             wrapText(value, msg.channel);
-
+                
             }).catch(error => {
                 console.log(error);
             });
@@ -290,7 +299,7 @@ client.on('message', msg  => {
 
     }
     else {
-        msg.channel.send("\"!" + command + "\"" + " is not a valid command.");
+        msg.channel.send("`!" + command + "`" + " is not a valid command. \nTry using: \n`!champ [name] [q, w, e, r, p(assive), blank]` \n`!item [name]` \n`!rune [name]`");
     }
 });
 
