@@ -92,16 +92,28 @@ function parseItem(url) {
 
 
 //Visits corresponding url and prints stats (base, level up) for the champion
-//TODO: Implement functionality, stat searching
-function parseStats(url, statType) {
+// urL - the fandom wiki link for the corresponding character or page
+function parseStats(url) {
     return got(url).then(response => {
 
         let result = '';
+
+        //Saves a const that allows for jQuery-like obtaining of page elements
         const $ = cheerio.load(response.body);
+
+        //Selects first stats table available on page
         $('.pi-theme-stats-table').each(function(i,e) {
+
+            //Use only index at i === 0
             if(i === 0) {
+
+                //Add title and formatting for statistics group
                 result += "**Base statistics**\n";
+
+                //For-each loop that iterates over each group of stats on the page
                 $(this).find('.pi-group').each(function(i,e) {
+
+                    //Finds header for all sections of the table (past the first)
                     if(i!==0) {
                         let header = '';
                         if($(this).find('a').length === 0){header = $(this).find('h2').text();}
@@ -112,6 +124,8 @@ function parseStats(url, statType) {
                         }
                         result += "\n**"+header+"**\n";
                     }
+
+                    //Stores names for the last section where informations is within different sections/tabs
                     let names = [];
                     if($(this).find(".pi-section-label").length>0) {
                         $(this).find(".pi-section-label").each(function(i,e) {
@@ -119,12 +133,18 @@ function parseStats(url, statType) {
                         });
                     }
                     
+                    //For-each loop that iterates over individual attribute on the page
                     $(this).find("[data-source]").each(function(i,e) {
 
+                        //Checks if the names array has been populated (meaning it is in the last section)
                         if (names.length > 0) {
+
+                            //Adds titles of the sections to result along with formatting
                             if(i===0) {result += names[0] + "\n";}
                             else if(i%4===0) {result += "\n" + names[i/4] + "\n";}
                         }
+
+                        //Remove extra elements from the text and trim it for the result
                         let text = $(this).text();
     
                         while(text.indexOf('<') >=0) {
@@ -132,18 +152,29 @@ function parseStats(url, statType) {
                         }
                         text = text.trim();
 
+                        //For formatting, space out the keys and values because they are read as "KeyValue" and they appear better as "Key: Value"
+                        //Use Regex to find the first number, '.', '-', '+' that occurs to put the spacing in
                         let firstCharacter = text.search(/([0-9]|-|\.([0-9]?\w?)[1]|\+)/);
+
+                        //Use another regex to find if '+' in the text is between numbers so we can space it out
                         let numberPlus = text.search(/[0-9]\+[0-9]/);
                         if(numberPlus > 0) {text = text.replace("+", " + ");}
+
+                        //For stats that have N/A, add spacing as well
                         if(text.includes("N/A")) { text = text.replace("N/A", ": N/A");} 
-                        else {text = text.substring(0, firstCharacter) + ": " + text.substring(firstCharacter); + "3"}
+
+                        //Finally concatenate the strings together with the proper formatting
+                        else {text = text.substring(0, firstCharacter) + ": " + text.substring(firstCharacter);}
                         result += text + "\n";
                     });
 
+                    //Once 4 sections of the pi-group have been, it needs to break otherwise it reads over a section again
                     if(i===3) {return false;}
                 });
             }
         });
+
+        //Return a promise with the newly found result text
         return new Promise(resolve => {
             if (result === '') throw new Error("Champion stats was not found.");
             setTimeout(() => resolve(result), 1000);
@@ -179,6 +210,28 @@ function parseAbilities(url, abilityType) {
         //For-each loop that iterates over reach ability on the page (only one if suffix is not blank or '')
         $('.skill' + suffix).each(function(i,e) {
 
+            //TODO: Use parent attribute to get ability type instead of hard-coding
+
+            let tooltips = ["Passive", "Q", "W", "E", "R"];
+            if(url.includes('Aphelios')) {
+                tooltips = ["Passive", "Weapon1", "Weapon2", "Weapon3", "Weapon4", "Weapon5", "Q", "W", "E", "R"];
+            }
+            else if (url.includes('Nidalee') || url.includes('Gnar')|| url.includes('Elise')) {
+                tooltips = ["Passive", "Q1", "W1", "E1", "Q2", "W2", "E2", "R"]
+            }
+            else if (url.includes('Jayce')) {
+                tooltips = ["Passive", "Q1", "W1", "E1","R1", "Passive (again)", "Q2", "W2", "E2", "R2"]
+            }
+
+            let ability = '';
+            if(suffix !== '') {
+                if(abilityType === 'p') {ability = "Passive";}
+                else {ability = abilityType.toUpperCase();}
+            }
+            else {
+                ability = tooltips[i];
+            }
+             
         //For-each loop that iterates over the container for the abilities to be searched (all or one)
             $(this).find('.ability-info-container').each(function(i, e) {
 
@@ -199,7 +252,10 @@ function parseAbilities(url, abilityType) {
                     while(name.indexOf('.21') >= 0) {
                         name = name.replace('.21', '!');
                     }
-                    result += name + "\n";
+                    while(name.indexOf('.2F') >= 0) {
+                        name = name.replace('.2F', '/');
+                    }
+                    result += "**" + name + " (" + ability + ")" + "**\n";
                     //console.log(name);
                 }
 
@@ -277,7 +333,7 @@ function parseAbilities(url, abilityType) {
 
         });
     
-
+        //Return a promise with the newly found result text
         return new Promise(resolve => {
              if (result === '') throw new Error("Champion abiliters were not found.");
              setTimeout(() => resolve(result), 1000);
@@ -329,12 +385,14 @@ client.on('message', msg  => {
         name = convertAbbreviation(name);
         name = fixSpecialCharacters(name.toUpperCase());
         
-
-        if (champ_names.includes(name) === true) {
+        if(!['q', 'w', 'e', 'r', 'p', ''].includes(param) && command !== 'stats') {
+            msg.channel.send("The parameter `" + param + "` is not valid. Please use one of [q, w, e, r, p(assive), (blank)].")
+        }
+        else if (champ_names.includes(name) === true) {
             //let url = "https://leagueoflegends.fandom.com/wiki/" + name + "/LoL/Gameplay";
             let result = '';
             if(command === 'stats') {
-                parseStats("https://leagueoflegends.fandom.com/wiki/" + name + "/LoL/Gameplay", param.toLowerCase()).then(value => {
+                parseStats("https://leagueoflegends.fandom.com/wiki/" + name + "/LoL/Gameplay").then(value => {
                     result = value;
                     wrapText(result, msg.channel);
                 }).catch(error => {
@@ -352,11 +410,6 @@ client.on('message', msg  => {
             }
            
         }
-
-            //Debug message to ensure link worked well
-            //msg.channel.send("https://leagueoflegends.fandom.com/wiki/" + name + "/LoL/Gameplay");
-        
-
         //Error checking in the even the champion is not found
         else {
             msg.channel.send('Champion: ' + name + ' not found');
@@ -369,7 +422,7 @@ client.on('message', msg  => {
 
     }
     else {
-        msg.channel.send("`!" + command + "`" + " is not a valid command. \nTry using: \n`!champ [name] [q, w, e, r, p(assive), blank]` \n`!item [name]` \n`!rune [name]`");
+        msg.channel.send("`!" + command + "`" + " is not a valid command. \nTry using: \n`!champ [name] [q, w, e, r, p(assive), (blank)]` \n`!item [name]` \n`!rune [name]`");
     }
 });
 
