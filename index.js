@@ -54,6 +54,33 @@ function convertAbbreviation(name) {
     }
 }
 
+function wrapText(text, channel) {
+    //While loop that splits up text if length is >2000 (unable to be sent through Discord)
+    while(text.length > 2000) {
+
+        //Sets size based on length of string
+        let size = text.length;
+
+        //Creates small string that is of valid size
+        let small_string = text.substring(0, 1999);
+
+        //Finds the last occurrence of a "\n" in small string so output can be printed in a nicer format
+        let ending = small_string.lastIndexOf('\n');
+
+        //Sets the valid string to this new ending
+        small_string = text.substring(0, ending);
+
+        //Sends message to channel
+        //TODO: Implement private user reply option as well
+        channel.send(small_string);
+
+        //Sets main string equal to the remaining sections
+        text = text.substring(ending, size);
+    }
+
+    //Final print for value which is either all of the input if <2000 or remaining input after other sections
+    channel.send(text);
+}
 //Visits corresponding url and prints stats for the rune along with description
 //TODO: Implement functionality for returning rune stats/description
 function parseRune(url) {
@@ -241,31 +268,8 @@ client.on('message', msg  => {
 
             parseAbilities("https://leagueoflegends.fandom.com/wiki/" + name + "/LoL/Gameplay", param.toLowerCase()).then(value =>{
 
-                //While loop that splits up text if length is >2000 (unable to be sent through Discord)
-                while(value.length > 2000) {
+            wrapText(value, msg.channel);
 
-                    //Sets size based on length of string
-                    let size = value.length;
-
-                    //Creates small string that is of valid size
-                    let small_string = value.substring(0, 1999);
-
-                    //Finds the last occurrence of a "\n" in small string so output can be printed in a nicer format
-                    let ending = small_string.lastIndexOf('\n');
-
-                    //Sets the valid string to this new ending
-                    small_string = value.substring(0, ending);
-
-                    //Sends message to channel
-                    //TODO: Implement private user reply option as well
-                    msg.channel.send(small_string);
-
-                    //Sets main string equal to the remaining sections
-                    value = value.substring(ending, size);
-                }
-
-                //Final print for value which is either all of the input if <2000 or remaining input after other sections
-                msg.channel.send(value);
             }).catch(error => {
                 console.log(error);
             });
