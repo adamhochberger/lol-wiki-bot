@@ -115,7 +115,7 @@ function parseAbilities(url, abilityType) {
         const $ = cheerio.load(response.body);
 
         //Determines if there should be a suffix appended to the skill class (enables a specific skill to be returned)
-        let suffix = ''
+        let suffix = '';
         if(skill !== '') {suffix = '_' + skill;}
 
         if(url.includes('Aphelios') && (suffix === '_q' || suffix === '_w')){
@@ -225,7 +225,7 @@ function parseAbilities(url, abilityType) {
     
 
         return new Promise(resolve => {
-             if (result == '') throw new Error("Champion information was not found.");
+             if (result === '') throw new Error("Champion abiliters were not found.");
              setTimeout(() => resolve(result), 1000);
         });
     });
