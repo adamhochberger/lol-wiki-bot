@@ -326,6 +326,22 @@ function parseAbilities(url, abilityType) {
                         }
                         
                     });
+
+                    //For-each loop that iterates over the secondary ability info (cooldown, range, etc)
+                    $(this).find('.ability-info').each(function(i,e) {
+                        //Removes all img src elements from the <p> text
+                        let text = $(this).text();
+                        while(text.indexOf('<') >=0) {
+                            text = text.substring(0, text.indexOf('<')-1) + text.substring(text.indexOf('>')+1, text.length);
+                        }
+
+                        //Appends final description text to result string 
+                        result += text.substring(0, text.length) + "\n";
+
+                        //Debug console log
+                        //console.log(text.substring(0, text.length-1));
+                        
+                    });
                 });
                 result += "\n";
                 //console.log();
