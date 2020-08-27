@@ -16,7 +16,8 @@ function fixSpecialCharacters(name) {
 
     //For loop that checks if champion is in list sans the special formatting and prints the name from the list if it is
     for(i = 0; i < champ_names.length; i++) {
-        if(champ_names[i].replace('_', '').toUpperCase() === fixed.toUpperCase() || champ_names[i].replace('\'', '').toUpperCase() === fixed.toUpperCase())
+        if(champ_names[i].replace('_', '').toUpperCase() === fixed.toUpperCase() || champ_names[i].replace('\'', '').toUpperCase() === fixed.toUpperCase()
+            || champ_names[i].replace('.', '').replace(' ').toUpperCase() === fixed.toUpperCase())
             return champ_names[i];
     }
     return fixed;
@@ -39,6 +40,7 @@ function convertAbbreviation(name) {
         "trynd": "Tryndamere",
         "ez": "Ezreal",
         "cait": "Caitlyn",
+        "mundo": "Dr._Mundo"
     }
 
     if(name in abbrev) {
@@ -169,7 +171,8 @@ function parseStats(url) {
                     });
 
                     //Once 4 sections of the pi-group have been, it needs to break otherwise it reads over a section again
-                    if(i===3) {return false;}
+                    //4th section is less useful so it currently prints out 3
+                    if(i===2) {return false;}
                 });
             }
         });
@@ -389,12 +392,14 @@ client.on('message', msg  => {
         if(args[args.length-1].toLowerCase() === 'passive') {args[args.length-1] = 'p';}
 
         //Sets value of parameter if the last argument is of size 1 (for ability selection)
-        if(args[args.length -1].length === 1) { offset = 1; param = args[args.length-1]}
+        if(args[args.length -1].length === 1) { offset = 1; param = args[args.length-1].toLowerCase()}
         
         //Builds champion name by adding all array elements - offset (since some champions require spaces)
         let name = '';
         for(i=0; i < args.length - offset; i++) {
-            name = name + args[i];
+            if(i===0) {name = args[i];}
+            else {name = name + "_" + args[i];}
+            
         }
         
         //Converts abbreviations and adds '_' and '\'' characters where needed for URl to succeed
@@ -402,7 +407,7 @@ client.on('message', msg  => {
         name = fixSpecialCharacters(name.toUpperCase());
         
         if(!['q', 'w', 'e', 'r', 'p', ''].includes(param) && command !== 'stats') {
-            msg.channel.send("The parameter `" + param + "` is not valid. Please use one of [q, w, e, r, p(assive), (blank)].")
+            msg.channel.send("The parameter `" + args[args.length-1] + "` is not valid. Please use one of [q, w, e, r, p(assive), (blank)].")
         }
         else if (champ_names.includes(name) === true) {
             //let url = "https://leagueoflegends.fandom.com/wiki/" + name + "/LoL/Gameplay";
@@ -438,7 +443,7 @@ client.on('message', msg  => {
 
     }
     else {
-        msg.channel.send("`!" + command + "`" + " is not a valid command. \nTry using: \n`!champ [name] [q, w, e, r, p(assive), (blank)]` \n`!item [name]` \n`!rune [name]`");
+        msg.channel.send("`!" + command + "`" + " is not a valid command. \nTry using: \n`!champ [name] [q, w, e, r, p(assive), (blank)]` \n`!item [name]` \n`!rune [name]` \n These commands are not case-sensitive.");
     }
 });
 
