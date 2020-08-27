@@ -122,7 +122,7 @@ function parseStats(url) {
                         let header = '';
                         if($(this).find('a').length === 0){header = $(this).find('h2').text();}
                         else {header = $(this).find('a').attr('title');}
-                        
+
                         while(header.indexOf('<') >=0) {
                             header = header.substring(0, header.indexOf('<')-1) + header.substring(header.indexOf('>')+1, header.length);
                         }
@@ -136,7 +136,7 @@ function parseStats(url) {
                             names[i] = $(this).text().trim();
                         });
                     }
-                    
+
                     //For-each loop that iterates over individual attribute on the page
                     $(this).find("[data-source]").each(function(i,e) {
 
@@ -150,7 +150,7 @@ function parseStats(url) {
 
                         //Remove extra elements from the text and trim it for the result
                         let text = $(this).text();
-    
+
                         while(text.indexOf('<') >=0) {
                             text = text.substring(0, text.indexOf('<')-1) + text.substring(text.indexOf('>')+1, text.length);
                         }
@@ -236,7 +236,7 @@ function parseAbilities(url, abilityType) {
             else {
                 ability = tooltips[i];
             }
-             
+
         //For-each loop that iterates over the container for the abilities to be searched (all or one)
             $(this).find('.ability-info-container').each(function(i, e) {
 
@@ -244,7 +244,14 @@ function parseAbilities(url, abilityType) {
                 let name = $(this).attr('id');
 
                 //Performs replace of characters from webpage 
-                if(name !== undefined) {
+		if(name === undefined) {
+		    name = $(this).find('td').first().text();
+                    while(name.indexOf('<') >=0) {
+                        name = name.substring(0, name.indexOf('<')-1) + name.substring(name.indexOf('>')+1, name.length);
+		    }
+		    name = name.substring(0, name.length-1);
+		}
+                else {
                     while(name.indexOf('_') >=0) {
                         name = name.replace('_', ' ');
                     }
@@ -260,9 +267,10 @@ function parseAbilities(url, abilityType) {
                     while(name.indexOf('.2F') >= 0) {
                         name = name.replace('.2F', '/');
                     }
-                    result += "**" + name + " (" + ability + ")" + "**\n";
                     //console.log(name);
                 }
+                result += "**" + name + " (" + ability + ")" + "**\n";
+
 
                 //For-each loop that iterates over each table within the ability 
                 $(this).find('table').each(function(i,e) {
@@ -281,8 +289,7 @@ function parseAbilities(url, abilityType) {
 
                         //Debug console log
                         //console.log(text.substring(0, text.length-1));
-                        
-                        
+
                     });
 
                     //For-each loop that iterates over the "rank" sections (damage, healing, etc) within the ability
@@ -329,7 +336,7 @@ function parseAbilities(url, abilityType) {
                             //Debug console log
                             //console.log(text.substring(0, text.length));
                         }
-                        
+
                     });
 
                     //For-each loop that iterates over the secondary ability info (cooldown, range, etc)
@@ -345,7 +352,7 @@ function parseAbilities(url, abilityType) {
 
                         //Debug console log
                         //console.log(text.substring(0, text.length-1));
-                        
+
                     });
                 });
                 result += "\n";
@@ -353,14 +360,14 @@ function parseAbilities(url, abilityType) {
             });
 
         });
-    
+
         //Return a promise with the newly found result text
         return new Promise(resolve => {
-             if (result === '') throw new Error("Champion abiliters were not found.");
+             if (result === '') throw new Error("Champion abilities were not found.");
              setTimeout(() => resolve(result), 1000);
         });
     });
-    
+
 }
 
 client.on('ready', () => {
@@ -405,13 +412,13 @@ client.on('message', msg  => {
         for(i=0; i < args.length - offset; i++) {
             if(i===0) {name = args[i];}
             else {name = name + "_" + args[i];}
-            
+
         }
-        
+
         //Converts abbreviations and adds '_' and '\'' characters where needed for URl to succeed
         name = convertAbbreviation(name);
         name = fixSpecialCharacters(name.toUpperCase());
-	        
+
         if(!['q', 'w', 'e', 'r', 'p', ''].includes(param) && command !== 'stats') {
             msg.channel.send("The parameter `" + args[args.length-1] + "` is not valid. Please use one of [q, w, e, r, p(assive), (blank)].")
         }
@@ -439,7 +446,7 @@ client.on('message', msg  => {
                     console.log(error);
                 });
             }
-           
+
         }
         //Error checking in the even the champion is not found
         else {
