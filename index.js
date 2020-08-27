@@ -40,7 +40,9 @@ function convertAbbreviation(name) {
         "trynd": "Tryndamere",
         "ez": "Ezreal",
         "cait": "Caitlyn",
-        "mundo": "Dr._Mundo"
+        "mundo": "Dr._Mundo",
+	"monkee": "Wukong",
+	"monkey": "Wukong"
     }
 
     if(name in abbrev) {
@@ -367,8 +369,12 @@ client.on('ready', () => {
 });
 
 client.on('message', msg  => {
-
-    if(!msg.content.startsWith("!") || msg.author.bot) return;
+    if(msg.content.includes(":pizzaDog:") ||
+        msg.content.toLowerCase().includes("pizza dog")){
+        msg.channel.send("Bow bow, shut ya mouth!");
+	return false;
+    }
+    else if(!msg.content.startsWith("!") || msg.author.bot) return;
 
 
     const args = msg.content.slice(1).trim().split(/ +/);
@@ -377,11 +383,11 @@ client.on('message', msg  => {
     // Checks if command is for champion
     // TODO: Implement item, rune functionality
     if(command === 'champ' || command === 'stats') {
-        
+
         //Check if arguments list is empty
         if(!args.length) {
             return msg.channel.send('Please add the parameters for the command `!lol [champion, rune, item name]`');
-            
+
         }
 
         //Values that will be used to check if user wants a specific part of champion abilities
@@ -393,7 +399,7 @@ client.on('message', msg  => {
 
         //Sets value of parameter if the last argument is of size 1 (for ability selection)
         if(args[args.length -1].length === 1) { offset = 1; param = args[args.length-1].toLowerCase()}
-        
+
         //Builds champion name by adding all array elements - offset (since some champions require spaces)
         let name = '';
         for(i=0; i < args.length - offset; i++) {
@@ -405,7 +411,7 @@ client.on('message', msg  => {
         //Converts abbreviations and adds '_' and '\'' characters where needed for URl to succeed
         name = convertAbbreviation(name);
         name = fixSpecialCharacters(name.toUpperCase());
-        
+	        
         if(!['q', 'w', 'e', 'r', 'p', ''].includes(param) && command !== 'stats') {
             msg.channel.send("The parameter `" + args[args.length-1] + "` is not valid. Please use one of [q, w, e, r, p(assive), (blank)].")
         }
@@ -415,8 +421,10 @@ client.on('message', msg  => {
             if(command === 'stats') {
                 parseStats("https://leagueoflegends.fandom.com/wiki/" + name + "/LoL/Gameplay").then(value => {
                     result = value;
+                    console.log(result);
                     wrapText(result, msg.channel);
                 }).catch(error => {
+                    msg.channel.send('Error finding champion:' +name + ' stats information.');
                     console.log(error);
                 });
 
@@ -424,8 +432,10 @@ client.on('message', msg  => {
             else{
                 parseAbilities("https://leagueoflegends.fandom.com/wiki/" + name + "/LoL/Gameplay", param.toLowerCase()).then(value =>{
                     result = value;
+                    console.log(value);
                     wrapText(result, msg.channel);
                 }).catch(error => {
+                    msg.channel.send('Error finding champion:' +name + ' ability information.');
                     console.log(error);
                 });
             }
