@@ -1,4 +1,4 @@
-const {champ_names, token} = require('./config.json')
+const {champ_names, token, item_names, abbreviations} = require('./config.json')
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const cheerio = require('cheerio');
@@ -8,17 +8,18 @@ const got = require('got');
 
 //Adjusts input names to match expected behavior from Wiki pages -
 // ' ' is replaced with '_'
-function fixSpecialCharacters(name) {
+function fixSpecialCharacters(name, names) {
     let fixed = name;
     while(fixed.indexOf(' ') >= 0) {
         fixed = fixed.replace(' ', '_');
     }
 
     //For loop that checks if champion is in list sans the special formatting and prints the name from the list if it is
-    for(i = 0; i < champ_names.length; i++) {
-        if(champ_names[i].replace('_', '').toUpperCase() === fixed.toUpperCase() || champ_names[i].replace('\'', '').toUpperCase() === fixed.toUpperCase()
-            || champ_names[i].replace('.', '').replace(' ').toUpperCase() === fixed.toUpperCase())
-            return champ_names[i];
+    for(i = 0; i < names.length; i++) {
+        if(names[i].replace('_', '').toUpperCase() === fixed.toUpperCase() || 
+            names[i].replace('\'', '').toUpperCase() === fixed.toUpperCase() || 
+            names[i].replace('.', '').replace(' ', '_').toUpperCase() === fixed.toUpperCase())
+            return names[i];
     }
     return fixed;
 }
@@ -27,26 +28,8 @@ function fixSpecialCharacters(name) {
 function convertAbbreviation(name) {
 
     //Dictionary of common character abbreviations
-    let abbrev = {
-        "Yi": "Master_Yi",
-        "masteryi": "Master_Yi",
-        "lee": "Lee_Sin",
-        "leesin": "Lee_Sin",
-        "mf": "Miss_Fortune",
-        "missfortune": "Miss_Fortune",
-        "vlad": "Vladimir",
-        "blitz": "Blitzcrank",
-        "kench": "Tahm_Kench",
-        "trynd": "Tryndamere",
-        "ez": "Ezreal",
-        "cait": "Caitlyn",
-        "mundo": "Dr._Mundo",
-	"monkee": "Wukong",
-	"monkey": "Wukong"
-    }
-
-    if(name in abbrev) {
-        return abbrev[name];
+    if(name in abbreviations) {
+        return abbreviations[name];
     }
     else {
         return name;
@@ -91,8 +74,59 @@ function parseRune(url) {
 //TODO: Implement functionality for returning item stats
 function parseItem(url) {
     //Will display the item passive, attributes, icon potentially, and gold efficiency
-    return null;
+    console.log(url);
+    result = '';
+
+    return got(url).then(response => {
+        const $ = cheerio.load(response.body);
+        $(this).find('.portable-infobox.pi-background.pi-theme-wikia.pi-layout-stacked').each(function(i,e) {
+            result += $(this).find('h2').text() + "\n";
+            $(this).find('section').each(function(i,e) {
+                if(i===0) {return;}
+                else {
+                    result += $(this).find('h2').text() + "\n";
+                    $(this).find('.pi-data-value').each(function(i,e) {
+                        let stat = $(this).text();
+                        while(stat.indexOf('<') >=0) {
+                            stat = stat.substring(0, stat.indexOf('<')-1) + stat.substring(stat.indexOf('>')+1, stat.length);
+                        }
+                        result += stat;
+                    })
+                }
+            });
+        });
+         //Return a promise with the newly found result text
+         return new Promise(resolve => {
+            if (result === '') throw new Error("Item stats were not found.");
+            setTimeout(() => resolve(result), 1000);
+       });
+    });
 }
+
+// function printItems() {
+//     return got('https://leagueoflegends.fandom.com/wiki/Item').then(response => {
+//         result = '';
+//         const $ = cheerio.load(response.body);
+//         $('.tlist').each(function(i,e) {
+//             if(i !== 8 && i !== 9) {
+//                 $(this).find('.item-icon').each(function(i, e) {
+//                     result += "\"" + $(this).attr('data-param') + "\",\n";
+//                 });
+//             }
+//         });
+        
+
+//         //Return a promise with the newly found result text
+//         return new Promise(resolve => {
+//             if (result === '') throw new Error("Item names were not found.");
+//             setTimeout(() => resolve(result), 1000);
+//        });
+
+//     }).catch(error => {
+//         console.log(error);
+//     });
+
+// }
 
 
 //Visits corresponding url and prints stats (base, level up) for the champion
@@ -376,10 +410,9 @@ client.on('ready', () => {
 });
 
 client.on('message', msg  => {
-    if(msg.content.includes(":pizzaDog:") ||
-        msg.content.toLowerCase().includes("pizza dog")){
+    if(msg.content.includes(":pizzaDog:") || msg.content.toLowerCase().includes("pizza dog")){
         msg.channel.send("Bow bow, shut ya mouth!");
-	return false;
+	    return false;
     }
     else if(!msg.content.startsWith("!") || msg.author.bot) return;
 
@@ -387,6 +420,8 @@ client.on('message', msg  => {
     const args = msg.content.slice(1).trim().split(/ +/);
     const command = args.shift().toLowerCase();
 
+    offset = 0;
+    
     // Checks if command is for champion
     // TODO: Implement item, rune functionality
     if(command === 'champ' || command === 'stats') {
@@ -398,7 +433,6 @@ client.on('message', msg  => {
         }
 
         //Values that will be used to check if user wants a specific part of champion abilities
-        offset = 0;
         param = '';
 
         //Checks if user has entered 'passive' and changes it to 'p'
@@ -416,8 +450,8 @@ client.on('message', msg  => {
         }
 
         //Converts abbreviations and adds '_' and '\'' characters where needed for URl to succeed
-        name = convertAbbreviation(name);
-        name = fixSpecialCharacters(name.toUpperCase());
+        name = convertAbbreviation(name.toLowerCase());
+        name = fixSpecialCharacters(name, champ_names);
 
         if(!['q', 'w', 'e', 'r', 'p', ''].includes(param) && command !== 'stats') {
             msg.channel.send("The parameter `" + args[args.length-1] + "` is not valid. Please use one of [q, w, e, r, p(assive), (blank)].")
@@ -454,7 +488,38 @@ client.on('message', msg  => {
         }
     }
     else if (command === "item") {
+        //Builds champion name by adding all array elements - offset (since some champions require spaces)
 
+        //Check if arguments list is empty
+        if(!args.length) {
+            return msg.channel.send('Please add the parameters for the command `!lol [champion, rune, item name]`');
+        }
+
+        let name = '';
+        for(i=0; i < args.length - offset; i++) {
+            if(i===0) {name = args[i];}
+            else {name = name + "_" + args[i];}
+
+        }
+
+        name = convertAbbreviation(name.toLowerCase());
+        name = fixSpecialCharacters(name, item_names);
+
+        if(item_names.includes(name)) {
+            console.log(name);        
+            parseItem("https://leagueoflegends.fandom.com/wiki/" + name).then(result => {
+                console.log(result);
+                wrapText(result, msg.channel);
+            });
+        }
+        else {
+            console.log("Not a valid url");
+            msg.channel.send(name + " is not a valid item.");
+        }
+        // printItems().then(result => {
+        //     console.log(result);
+        //     wrapText(result, msg.channel);
+        // });
     }
     else if (command === "rune") {
 
