@@ -1,4 +1,5 @@
-const {champ_names, token, item_names, abbreviations} = require('./config.json')
+const {champ_names, item_names, abbreviations} = require('./config.json');
+const {token} = require('./auth.json');
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const cheerio = require('cheerio');
