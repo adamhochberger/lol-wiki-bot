@@ -81,29 +81,64 @@ function parseRune(url) {
 //TODO: Implement functionality for returning item stats
 function parseItem(url) {
     //Will display the item passive, attributes, icon potentially, and gold efficiency
-    console.log(url);
     result = '';
 
     return got(url).then(response => {
+        console.log(url);
         const $ = cheerio.load(response.body);
-        $(this).find('.portable-infobox.pi-background.pi-theme-wikia.pi-layout-stacked').each(function(i,e) {
-            result += $(this).find('h2').text() + "\n";
+
+        //TODO: Fix formatting and ensure that titles are being properly printed
+        $('.portable-infobox').each(function(i,e) {
+            result += $(this).find('h2').contents().get(0).nodeValue + "\n\n";
+            sections = $(this).find('section').length-1;
             $(this).find('section').each(function(i,e) {
                 if(i===0) {return;}
                 else {
-                    result += $(this).find('h2').text() + "\n";
-                    $(this).find('.pi-data-value').each(function(i,e) {
-                        let stat = $(this).text();
-                        while(stat.indexOf('<') >=0) {
-                            stat = stat.substring(0, stat.indexOf('<')-1) + stat.substring(stat.indexOf('>')+1, stat.length);
+                    if(i===sections-2) {
+                        result += $(this).parent().find('.pi-header').eq(sections-2).text() + "\n";
+                    }
+                    else {
+                        result += $(this).find('h2').text() + ":\n";
+                    }
+                    if($(this).find('table').length > 0) {
+                        $(this).find('table').each(function(i,e) {
+                            if($(this).find('td').length === 1) {
+                                $(this).find('td').each(function(i,e) {
+                                    length = $(this).find('span').length;
+                                    $(this).find('span').each(function(i,e) {
+                                        if(i < length-3){
+                                            result += $(this).attr('data-param');
+                                            result += " + ";
+                                        }
+                                        else if(i=== length-1){
+                                            result += removeTags($(this).text()) + "\n";
+                                        }
+                                    });
+                                });
+                            }
+                            else {
+                                for(index=0; index < 3; index++) {
+                                    result += removeTags($(this).find('th').eq(index).text()) + "\n";
+                                    result += removeTags($(this).find('td').eq(index).text()) + "\n";
+                                }
+                            }
+                            
+                        });
+                    }
+                    else {
+                        if($(this).find('h3').length > 0) {
+                            result += removeTags($(this).find('h3').text()) + ":\n";
                         }
-                        result += stat;
-                    })
+                        $(this).find('.pi-data-value').each(function(i,e) {
+                            result += removeTags($(this).text()) + "\n";
+                        });
+                    }
+                    result += "\n";
                 }
             });
         });
          //Return a promise with the newly found result text
-         return new Promise(resolve => {
+        return new Promise(resolve => {
             if (result === '') throw new Error("Item stats were not found.");
             setTimeout(() => resolve(result), 1000);
        });
@@ -514,7 +549,8 @@ client.on('message', msg  => {
 
         if(item_names.includes(name)) {
             console.log(name);        
-            parseItem("https://leagueoflegends.fandom.com/wiki/" + name).then(result => {
+            parseItem("https://leagueoflegends.fandom.com/wiki/" + name).then(value => {
+                result = value;
                 console.log(result);
                 wrapText(result, msg.channel);
             });
@@ -537,4 +573,4 @@ client.on('message', msg  => {
 });
 
 
-client.login(token)
+client.login(token);
