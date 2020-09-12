@@ -6,6 +6,12 @@ const cheerio = require('cheerio');
 const got = require('got');
 
 
+function removeTags(result) {
+    while(result.indexOf('<') >=0) {
+        result = result.substring(0, result.indexOf('<')-1) + result.substring(result.indexOf('>')+1, result.length);
+    }
+    return result;
+}
 
 //Adjusts input names to match expected behavior from Wiki pages -
 // ' ' is replaced with '_'
