@@ -8,8 +8,10 @@ const got = require('got');
 
 //Removes any link or image tags (<a/> or <img/>) that could be printed as text
 function removeTags(result) {
+    if(result.indexOf('<') >=0 && result.indexOf('>') >= 0) {
     while(result.indexOf('<') >=0) {
         result = result.substring(0, result.indexOf('<')-1) + result.substring(result.indexOf('>')+1, result.length);
+    }
     }
     return result;
 }
@@ -394,9 +396,7 @@ function parseAbilities(url, abilityType) {
 
                         //Removes all img src elements from the <p> text
                         let text = $(this).text();
-                        while(text.indexOf('<') >=0) {
-                            text = text.substring(0, text.indexOf('<')-1) + text.substring(text.indexOf('>')+1, text.length);
-                        }
+                        text = removeTags(text);
 
                         //Appends final description text to result string 
                         result += text.substring(0, text.length) + "\n";
@@ -420,9 +420,7 @@ function parseAbilities(url, abilityType) {
 
                                     //Removes all img src elements from the children text
                                     let text = $(this).text();
-                                    while(text.indexOf('<') >=0) {
-                                        text = text.substring(0, text.indexOf('<')-1) + text.substring(text.indexOf('>')+1, text.length);
-                                    }
+                                    text = removeTags(text);
 
                                     //Appends final description text to result string 
                                     result += text.substring(0, text.length) + "\n";
@@ -441,9 +439,8 @@ function parseAbilities(url, abilityType) {
 
                             //Removes all img src elements from the children text
                             let text = $(this).text();
-                            while(text.indexOf('<') >=0) {
-                                text = text.substring(0, text.indexOf('<')-1) + text.substring(text.indexOf('>')+1, text.length);
-                            }
+                            text = removeTags(text);
+
                             //Appends final description text to result string 
                             result += text.substring(0, text.length) + "\n";
 
@@ -457,9 +454,7 @@ function parseAbilities(url, abilityType) {
                     $(this).find('.ability-info').each(function(i,e) {
                         //Removes all img src elements from the <p> text
                         let text = $(this).text();
-                        while(text.indexOf('<') >=0) {
-                            text = text.substring(0, text.indexOf('<')-1) + text.substring(text.indexOf('>')+1, text.length);
-                        }
+                        text = removeTags(text);
 
                         //Appends final description text to result string 
                         result += text.substring(0, text.length) + "\n";
