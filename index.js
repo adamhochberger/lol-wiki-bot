@@ -9,9 +9,9 @@ const got = require('got');
 //Removes any link or image tags (<a/> or <img/>) that could be printed as text
 function removeTags(result) {
     if(result.indexOf('<') >=0 && result.indexOf('>') >= 0) {
-    while(result.indexOf('<') >=0) {
-        result = result.substring(0, result.indexOf('<')-1) + result.substring(result.indexOf('>')+1, result.length);
-    }
+        while(result.indexOf('<') >=0) {
+            result = result.substring(0, result.indexOf('<')-1) + result.substring(result.indexOf('>')+1, result.length);
+        }
     }
     return result;
 }
@@ -88,6 +88,7 @@ function parseItem(url) {
 
     return got(url).then(response => {
         console.log(url);
+
         const $ = cheerio.load(response.body);
 
         //TODO: Fix formatting and ensure that titles are being properly printed
@@ -97,7 +98,7 @@ function parseItem(url) {
             result += $(this).find('h2').contents().get(0).nodeValue + "\n\n";
 
             //Finds number of sections for use in the "Recipe" tag
-            sections = $(this).find('section').length-1;
+
             $(this).find('section').each(function(i,e) {
 
                 //Skips the first tag as this is an image
@@ -113,36 +114,51 @@ function parseItem(url) {
                     //Checks if section contains a table (requires different parsing of elements)
                     if($(this).find('table').length > 0) {
 
-                        //Function that runs for each table (should usually be one)
+                        //Function that runs for each table (should be one)
                         $(this).find('table').each(function(i,e) {
 
+                            // #Recipe
+
                             //Verifies if there is only one td object, indicating it is the 'recipe' section
-                            if($(this).find('td').length === 1) {
+                            // if($(this).find('td').length === 1) {
 
-                                //Sets the scope of this to be the lone 'td' element
-                                $(this).find('td').each(function(i,e) {
-                                    result += "Recipe:\n";
-                                    
-                                    //Length of the span elements is found to print the item objects in the recipe
-                                    length = $(this).find('span').length;
-                                    $(this).find('span').each(function(i,e) {
+                            //     //Sets the scope of this to be the lone 'td' element
+                            //     $(this).find('td').each(function(i,e) {
+                            //         result += "Recipe:\n";
 
-                                        //Prints all elements before the last 3 unneeded span elements (span(span(gold icon), span(gold number)))
-                                        if(i < length-3){
-                                            result += $(this).attr('data-param');
-                                            result += " + ";
-                                        }
+                            //         //Length of the span elements is found to print the item objects in the recipe
+                            //         length = $(this).find('span').length;
+                            //         $(this).find('span').each(function(i,e) {
 
-                                        //Prints the final element - the combine cost of the item
-                                        else if(i===length-1){
-                                            result += removeTags($(this).text()) + "\n";
-                                        }
+                            //             //Prints all elements before the last 3 unneeded span elements (span(span(gold icon), span(gold number)))
+                            //             if(i < length-3){
+                            //                 result += $(this).attr('data-param');
+                            //                 result += " + ";
+                            //             }
+
+                            //             //Prints the final element - the combine cost of the item
+                            //             else if(i===length-1){
+                            //                 result += removeTags($(this).text()) + "\n";
+                            //             }
+                            //         });
+                            //     });
+                            // }
+
+                            //If there is >1 td objects, then it is a cost/sell/code section, also has print for recipe before it
+                            if($(this).find('td').length !== 1)  {
+
+                                if($('table[style="border-collapse:collapse;"]').find('tbody').length === 1) {
+                                    result += "Recipe:\n"
+                                    $('table[style="border-collapse:collapse;"]').find('tbody').each(function(i,e) {
+                                        $(this).find('.item').each(function(i,e) {
+                                            if(i===0){return;}
+                                            result += removeTags($(this).find('.name').text()) + " (" + removeTags($(this).find('.gold').text()).replace(' ','') + " gold) +\n";
+                                        });
+                                        result += removeTags($(this).find('.item').eq(0).find('.gold').find('span[style="white-space:normal;"]').eq(1).text()) + " gold\n";
                                     });
-                                });
-                            }
+                                    result += "\n\n";
+                                };  
 
-                            //If there is >1 td objects, then it is a cost/sell/code section
-                            else {
                                 for(index=0; index < 3; index++) {
                                     
                                     //Prints the corresponding header and data section for each part of the table
