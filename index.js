@@ -104,6 +104,7 @@ function parseItem(url) {
                 //Skips the first tag as this is an image
                 //TODO: Implement url as part of the result so it may be displayed on Discord
                 if(i===0) {return;}
+                else if($(this).find('caption').text() === 'Availability') {return;}
                 else {
 
                     //Prints header of section
@@ -117,50 +118,68 @@ function parseItem(url) {
                         //Function that runs for each table (should be one)
                         $(this).find('table').each(function(i,e) {
 
-                            // #Recipe
-
-                            //Verifies if there is only one td object, indicating it is the 'recipe' section
-                            // if($(this).find('td').length === 1) {
-
-                            //     //Sets the scope of this to be the lone 'td' element
-                            //     $(this).find('td').each(function(i,e) {
-                            //         result += "Recipe:\n";
-
-                            //         //Length of the span elements is found to print the item objects in the recipe
-                            //         length = $(this).find('span').length;
-                            //         $(this).find('span').each(function(i,e) {
-
-                            //             //Prints all elements before the last 3 unneeded span elements (span(span(gold icon), span(gold number)))
-                            //             if(i < length-3){
-                            //                 result += $(this).attr('data-param');
-                            //                 result += " + ";
-                            //             }
-
-                            //             //Prints the final element - the combine cost of the item
-                            //             else if(i===length-1){
-                            //                 result += removeTags($(this).text()) + "\n";
-                            //             }
-                            //         });
-                            //     });
-                            // }
-
                             //If there is >1 td objects, then it is a cost/sell/code section, also has print for recipe before it
                             if($(this).find('td').length !== 1)  {
 
-                                if($('table[style="border-collapse:collapse;"]').find('tbody').length === 1) {
+                                /*
+                                    Still have one tbody
+                                    For each tr
+                                    When td rowspan=2 is found, add spaces
+                                    Only check first item none past
+
+                                */
+
+                                //Targets the style of table that holds the recipe information
+                                if($('table[style="border-collapse:collapse;"]').find('tbody').length > 0) {
+
+                                    //Appends header to result
                                     result += "Recipe:\n"
+
+                                    //Sets a spacing variable that is used for indentation
+                                    spacing = '';
                                     $('table[style="border-collapse:collapse;"]').find('tbody').each(function(i,e) {
-                                        $(this).find('.item').each(function(i,e) {
-                                            if(i===0){return;}
-                                            result += removeTags($(this).find('.name').text()) + " (" + removeTags($(this).find('.gold').text()).replace(' ','') + " gold) +\n";
+
+                                        //Only uses the first table found
+                                        if(i > 0){return;}
+
+                                        //Sets spacing to be indented since name will be printed without it and the remaining cost requires spacing
+                                        spacing = '    ';
+                                        result += removeTags($(this).find('.name').eq(0).text()) + " (" + 
+                                        removeTags($(this).find('.gold').find('span[style="white-space:normal;"]').eq(0).text()) + ") - \n" + spacing +
+                                        removeTags($(this).find('.gold').find('span[style="white-space:normal;"]').eq(1).text()) + " gold";
+
+                                        //Targets all remaining items with the given style
+                                        $(this).find('td[rowspan="2"]').each(function(i,e) {
+
+                                            //Checks if the item that has been found is advanced (has two given gold values)
+                                            if($(this).find('.gold').find('span[style="white-space:normal;"]').length > 1) {
+
+                                                //Adjusts spacing so all advanced items are on the same level
+                                                if(spacing !== '    '){spacing = '    ';}
+
+                                                //Prints new line along with item name
+                                                result += " +\n" + spacing + removeTags($(this).find('.name').eq(0).text()) +  " ("
+                                                
+                                                //Adds back indentation
+                                                spacing += '    ';
+
+                                                //Adds the given gold values (total cost) - (remaining cost)
+                                                result += removeTags($(this).find('.gold').find('span[style="white-space:normal;"]').eq(0).text()) + ") - \n" + spacing +
+                                                removeTags($(this).find('.gold').find('span[style="white-space:normal;"]').eq(1).text()) + " gold";
+                                            }
+                                            else {
+
+                                                //Otherwise adds the name and single gold value with no adjustment to spacing
+                                                result += " +\n" + spacing + removeTags($(this).find('.name').eq(0).text()) +  " ("
+                                                result += removeTags($(this).find('.gold').eq(0).text()).replace(' ','') + " gold)";
+                                            }
                                         });
-                                        result += removeTags($(this).find('.item').eq(0).find('.gold').find('span[style="white-space:normal;"]').eq(1).text()) + " gold\n";
                                     });
                                     result += "\n\n";
-                                };  
-
+                                };      
+                                
+                                //Iterates over the 3 sections: cost, sell price, code
                                 for(index=0; index < 3; index++) {
-                                    
                                     //Prints the corresponding header and data section for each part of the table
                                     result += removeTags($(this).find('th').eq(index).text()) + ": " + removeTags($(this).find('td').eq(index).text());
                                     if(index !== 2) {result += " gold";}
