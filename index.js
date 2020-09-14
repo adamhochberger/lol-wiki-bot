@@ -1,3 +1,4 @@
+
 const {champ_names, item_names, abbreviations} = require('./config.json');
 const {token} = require('./auth.json');
 const Discord = require('discord.js');
@@ -5,7 +6,7 @@ const client = new Discord.Client();
 const cheerio = require('cheerio');
 const got = require('got');
 
-
+//Removes any link or image tags (<a/> or <img/>) that could be printed as text
 function removeTags(result) {
     while(result.indexOf('<') >=0) {
         result = result.substring(0, result.indexOf('<')-1) + result.substring(result.indexOf('>')+1, result.length);
@@ -89,48 +90,85 @@ function parseItem(url) {
 
         //TODO: Fix formatting and ensure that titles are being properly printed
         $('.portable-infobox').each(function(i,e) {
+
+            //Prints item name at top of the result
             result += $(this).find('h2').contents().get(0).nodeValue + "\n\n";
+
+            //Finds number of sections for use in the "Recipe" tag
             sections = $(this).find('section').length-1;
             $(this).find('section').each(function(i,e) {
+
+                //Skips the first tag as this is an image
+                //TODO: Implement url as part of the result so it may be displayed on Discord
                 if(i===0) {return;}
                 else {
-                    if(i===sections-2) {
-                        result += $(this).parent().find('.pi-header').eq(sections-2).text() + "\n";
-                    }
-                    else {
+
+                    //Prints header of section
+                    if($(this).find('h2').text() !== '') {
                         result += $(this).find('h2').text() + ":\n";
                     }
+
+                    //Checks if section contains a table (requires different parsing of elements)
                     if($(this).find('table').length > 0) {
+
+                        //Function that runs for each table (should usually be one)
                         $(this).find('table').each(function(i,e) {
+
+                            //Verifies if there is only one td object, indicating it is the 'recipe' section
                             if($(this).find('td').length === 1) {
+
+                                //Sets the scope of this to be the lone 'td' element
                                 $(this).find('td').each(function(i,e) {
+                                    result += "Recipe:\n";
+                                    
+                                    //Length of the span elements is found to print the item objects in the recipe
                                     length = $(this).find('span').length;
                                     $(this).find('span').each(function(i,e) {
+
+                                        //Prints all elements before the last 3 unneeded span elements (span(span(gold icon), span(gold number)))
                                         if(i < length-3){
                                             result += $(this).attr('data-param');
                                             result += " + ";
                                         }
-                                        else if(i=== length-1){
+
+                                        //Prints the final element - the combine cost of the item
+                                        else if(i===length-1){
                                             result += removeTags($(this).text()) + "\n";
                                         }
                                     });
                                 });
                             }
+
+                            //If there is >1 td objects, then it is a cost/sell/code section
                             else {
                                 for(index=0; index < 3; index++) {
-                                    result += removeTags($(this).find('th').eq(index).text()) + "\n";
-                                    result += removeTags($(this).find('td').eq(index).text()) + "\n";
+                                    
+                                    //Prints the corresponding header and data section for each part of the table
+                                    result += removeTags($(this).find('th').eq(index).text()) + ": " + removeTags($(this).find('td').eq(index).text());
+                                    if(index !== 2) {result += " gold";}
+                                    result += "\n";
                                 }
                             }
                             
                         });
                     }
                     else {
+
+                        //If the passive section contains another section, it is displayed
                         if($(this).find('h3').length > 0) {
                             result += removeTags($(this).find('h3').text()) + ":\n";
                         }
+
+                        //Prints out the corresponding stats
                         $(this).find('.pi-data-value').each(function(i,e) {
-                            result += removeTags($(this).text()) + "\n";
+                            if($(this).find('.item').length > 0) {
+                                $(this).find('.item').each(function(i,e){
+                                    result += $(this).find('.name').attr('data-param') + "\n";
+                                });
+                            }
+                            else{
+                                result += removeTags($(this).text()) + "\n";
+                            }
                         });
                     }
                     result += "\n";
