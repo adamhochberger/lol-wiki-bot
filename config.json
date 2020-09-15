@@ -78,6 +78,7 @@
         "mobis": "Boots_of_Mobility",
         "swiftys": "Boots_of_Swiftness",
         "triforce": "Trinity_Force",
+        "trinity": "Trinity_Force",
         "spectres": "Spectre's_Cowl",
         "abyssal": "Abyssal_Helm",
         "ie": "Infinity_Edge",
@@ -94,6 +95,34 @@
         "runaans": "Runaan's_Hurricane",
         "rylais": "Rylai's_Crystal_Scepter",
         "shiv": "Statikk_Shiv",
-        "pd": "Phantom_Dancer"
-    }
+        "pd": "Phantom_Dancer",
+        "locket": "Locket_of_the_Iron_Solari",
+        "ludens": "Luden's_Echo"
+    },
+
+    "tft_traits": ["Astro", "Battlecast", "Celestial", "Chrono", "Cybernetic", "Dark_Star", "Mech-Pilot", "Rebel", "Space_Pirate",
+    "Star_Guardian", "Blademaster", "Blaster", "Brawler", "Demolitionist", "Infiltrator", "Mana-Reaver", "Mercenary",
+    "Mystic", "Paragon", "Protector", "Sniper", "Sorcerer", "Starship","Vanguard"],
+
+    "tft_item_names": ["Aspect_of_Dusk", "Assassin", "B._F._Sword", "Battlecast_Plating", "Berserker's_Axe", "Blade_of_the_Ruined_King",
+    "Bloodthirster", "Blue_Buff", "Bramble_Vest", "Celestial_Orb", "Chain_Vest", "Chalice_of_Favor", "Chalice_of_Power", "Cursed_Blade",
+    "Darkin", "Dark_Star's_Heart", "Deathblade", "Demolitionist's_Charge", "Divine", "Dragon's_Claw", "Duelist", "Duelist's_Zeal",
+    "Dusk", "Elderwood", "Elderwood_Heirloom", "Force_of_Nature", "Frozen_Heart",
+    "Frozen_Mallet","Gargoyle_Stoneplate","Giant's_Belt","Giant_Slayer","Guardian_Angel","Guinsoo's_Rageblade","Hand_of_Justice","Hextech_Gunblade",
+    "Hush","Iceborn_Gauntlet","Inferno's_Cinder","Infiltrator's_Talons","Infinity_Edge","Ionic_Spark","Jeweled_Gauntlet","Kayn's_Liberation",
+    "Knight's_Vow","Last_Whisper","Locket_of_the_Iron_Solari","Luden's_Echo","Mage","Mage's_Cap","Mittens","Morellonomicon","Needlessly_Large_Rod",
+    "Neeko's_Help","Negatron_Cloak","Phantom_Dancer","Protector's_Chestguard","Quicksilver","Rabadon's_Deathcap","Rapid_Firecannon",
+    "Rebel_Medal","Recurve_Bow","Redemption","Red_Buff","Repeating_Crossbow","Rhaast's_Embrace","Runaan's_Hurricane","Seraph's_Embrace",
+    "Shroud_of_Stillness","Sparring_Gloves","Spatula","Spear_of_Shojin","Star_Guardian's_Charm","Statikk_Shiv","Sunfire_Cape","Sword_Breaker",
+    "Sword_of_the_Divine","Talisman_of_Light","Tear_of_the_Goddess","Thief's_Gloves","Thornmail","Titan's_Resolve","Titanic_Hydra","Trap_Claw",
+    "Vanguard","Vanguard's_Cuirass","Warden's_Mail","Warlord","Warlord's_Banner","Warmog's_Armor","Youmuu's_Ghostblade","Yuumi","Zed",
+    "Zeke's_Herald","Zephyr","Zz'Rot_Portal"],
+
+    "tft_champions" :["Ahri", "Annie", "Ashe", "Aurelion_Sol", "Bard", "Blitzcrank", "Caitlyn", "Cassiopeia","Darius", 
+    "Ekko", "Ezreal", "Fiora", "Fizz", "Gangplank", "Gnar", "Graves", "Illaoi", "Irelia", "Janna","Jarvan_IV", "Jayce",    
+    "Jhin", "Jinx", "Karma", "Kog'Maw", "Leona", "Lucian", "Lulu", "Malphite", "Master_Yi",    
+    "Mordekaiser", "Nautilus", "Neeko", "Nocturne",  "Poppy", "Rakan", "Riven", "Rumble", "Shaco", "Shen", "Soraka",
+    "Syndra", "Teemo", "Thresh", "Twisted_Fate", "Urgot", "Vayne", "Vi", "Viktor", "Wukong", "Xayah", "Xerath",
+    "Xin_Zhao", "Yasuo", "Zed", "Ziggs", "Zoe"
+    ]
 }
