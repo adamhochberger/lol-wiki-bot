@@ -100,9 +100,9 @@
         "ludens": "Luden's_Echo"
     },
 
-    "tft_traits": ["Astro", "Battlecast", "Celestial", "Chrono", "Cybernetic", "Dark_Star", "Mech-Pilot", "Rebel", "Space_Pirate",
-    "Star_Guardian", "Blademaster", "Blaster", "Brawler", "Demolitionist", "Infiltrator", "Mana-Reaver", "Mercenary",
-    "Mystic", "Paragon", "Protector", "Sniper", "Sorcerer", "Starship","Vanguard"],
+    "tft_traits": ["Adept", "Assassin", "Brawler", "Cultist", "Dazzler", "Divine", "Duelist", "Dusk", "Elderwood",
+        "Emperor", "Enlightened","Exile", "Fortune", "Hunter", "Keeper", "Mage", "Moonlight", "Mystic",
+        "Ninja", "Shade","Sharpshooter", "Spirit", "The_Boss", "Tormented", "Vanguard", "Warlord"],
 
     "tft_item_names": ["Aspect_of_Dusk", "Assassin", "B._F._Sword", "Battlecast_Plating", "Berserker's_Axe", "Blade_of_the_Ruined_King",
     "Bloodthirster", "Blue_Buff", "Bramble_Vest", "Celestial_Orb", "Chain_Vest", "Chalice_of_Favor", "Chalice_of_Power", "Cursed_Blade",
