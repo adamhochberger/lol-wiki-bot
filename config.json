@@ -1,5 +1,5 @@
 {
-    "champ_names" : ["Aatrox","Ahri","Akali","Alistar","Amumu",
+    "champs" : ["Aatrox","Ahri","Akali","Alistar","Amumu",
     "Anivia","Annie","Aphelios","Ashe","Aurelion_Sol","Azir","Bard",
     "Blitzcrank","Brand","Braum","Caitlyn","Camille","Cassiopeia",
     "Cho'Gath","Corki","Darius","Diana","Draven","Dr._Mundo","Ekko",
@@ -21,9 +21,9 @@
     "Veigar","Vel'Koz","Vi","Viktor","Vladimir","Volibear","Warwick", "Wukong",
     "Xayah","Xerath","Xin_Zhao","Yasuo","Yone","Yorick","Yuumi","Zac","Zed","Ziggs","Zilean","Zoe","Zyra"],
     
-    "item_names": ["'Your_Cut'",  "Abyssal_Mask", "Adaptive_Helm", "Aegis_of_the_Legion", "Aether_Wisp",
+    "items": ["'Your_Cut'",  "Abyssal_Mask", "Adaptive_Helm", "Aegis_of_the_Legion", "Aether_Wisp",
      "Amplifying_Tome","Anti-tower_Socks", "Archangel's_Staff", "Archangel's_Staff_(Quick_Charge)", "Ardent_Censer",
-    "Athene's_Unholy_Grail", "B. F. Sword", "Bami's_Cinder", "Banshee's_Veil", "Berserker's_Greaves", "Bilgewater_Cutlass", 
+    "Athene's_Unholy_Grail", "B._F._Sword", "Bami's_Cinder", "Banshee's_Veil", "Berserker's_Greaves", "Bilgewater_Cutlass", 
     "Black_Cleaver", "Black_Mist_Scythe", "Black_Spear", "Blade_of_the_Ruined_King", "Blasting_Wand", "Bloodrazor",
     "Bloodthirster", "Boots_of_Mobility", "Boots_of_Speed", "Boots_of_Swiftness", "Bramble_Vest", "Bulwark_of_the_Mountain",
     "Catalyst_of_Aeons", "Caulfield's_Warhammer", "Chain_Vest", "Chalice_of_Harmony", "Cinderhulk", "Circlet_of_the_Iron_Solari",
@@ -104,7 +104,8 @@
         "Emperor", "Enlightened","Exile", "Fortune", "Hunter", "Keeper", "Mage", "Moonlight", "Mystic",
         "Ninja", "Shade","Sharpshooter", "Spirit", "The_Boss", "Tormented", "Vanguard", "Warlord"],
 
-    "tft_item_names": ["Aspect_of_Dusk", "Assassin", "B._F._Sword", "Battlecast_Plating", "Berserker's_Axe", "Blade_of_the_Ruined_King",
+    
+    "tft_items": ["Aspect_of_Dusk", "Assassin", "B._F._Sword", "Battlecast_Plating", "Berserker's_Axe", "Blade_of_the_Ruined_King",
     "Bloodthirster", "Blue_Buff", "Bramble_Vest", "Celestial_Orb", "Chain_Vest", "Chalice_of_Favor", "Chalice_of_Power", "Cursed_Blade",
     "Darkin", "Dark_Star's_Heart", "Deathblade", "Demolitionist's_Charge", "Divine", "Dragon's_Claw", "Duelist", "Duelist's_Zeal",
     "Dusk", "Elderwood", "Elderwood_Heirloom", "Force_of_Nature", "Frozen_Heart",
@@ -118,7 +119,7 @@
     "Vanguard","Vanguard's_Cuirass","Warden's_Mail","Warlord","Warlord's_Banner","Warmog's_Armor","Youmuu's_Ghostblade","Yuumi","Zed",
     "Zeke's_Herald","Zephyr","Zz'Rot_Portal"],
 
-    "tft_champions" :["Ahri", "Annie", "Ashe", "Aurelion_Sol", "Bard", "Blitzcrank", "Caitlyn", "Cassiopeia","Darius", 
+    "tft_champs" :["Ahri", "Annie", "Ashe", "Aurelion_Sol", "Bard", "Blitzcrank", "Caitlyn", "Cassiopeia","Darius", 
     "Ekko", "Ezreal", "Fiora", "Fizz", "Gangplank", "Gnar", "Graves", "Illaoi", "Irelia", "Janna","Jarvan_IV", "Jayce",    
     "Jhin", "Jinx", "Karma", "Kog'Maw", "Leona", "Lucian", "Lulu", "Malphite", "Master_Yi",    
     "Mordekaiser", "Nautilus", "Neeko", "Nocturne",  "Poppy", "Rakan", "Riven", "Rumble", "Shaco", "Shen", "Soraka",
