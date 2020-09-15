@@ -1,5 +1,5 @@
 
-const {champ_names, item_names} = require('./config.json');
+const {champs, items, tft_champs, tft_items, tft_traits} = require('./config.json');
 const {token} = require('./auth.json');
 const Discord = require('discord.js');
 const client = new Discord.Client();
@@ -153,7 +153,80 @@ client.on('message', msg  => {
         
     }
     else if (command === "rune") {
+    }
+    else if (command === "tft") {
 
+        //Check if arguments list is empty
+        if(!args.length) {
+            return msg.channel.send('Please add the parameters for the command `!tft [(c)hamp/(i)tem/(t)rait] [name]`');
+        }
+
+        param = args.shift().toLowerCase();
+
+        //Builds champion name by adding all array elements - offset (since some champions require spaces)
+        name = '';
+        for(i=0; i < args.length; i++) {
+            if(i===0) {name = args[i];}
+            else {name = name + "_" + args[i];}
+        }
+
+        if(param === "champ" || param === "c"){
+            name = TextManip.fixSpecialCharacters(name, tft_champs);
+            if(tft_champs.includes(name)) {
+                console.log(name);        
+                Parser.readTFTChampion("https://leagueoflegends.fandom.com/wiki/" + name + "/TFT").then(value => {
+                    result = value;
+                    console.log(result);
+                    wrapText(result, msg.channel);
+                }).catch(error => {
+                    msg.channel.send('Error finding champion:' + name.replace(' ', '') + '\'s TFT information.');
+                    console.log(error);
+                });
+            }
+            else {
+                console.log("Not a valid url");
+                msg.channel.send(name + " is not a valid champion (in TFT).");
+            }
+        }
+        else if(param === "item" || param === "i"){
+            name = TextManip.fixSpecialCharacters(name, tft_items);
+            if(tft_items.includes(name)) {
+                console.log(name);        
+                Parser.readTFTItem("https://leagueoflegends.fandom.com/wiki/" + name + "_(Teamfight_Tactics)").then(value => {
+                    result = value;
+                    console.log(result);
+                    wrapText(result, msg.channel);
+                }).catch(error => {
+                    msg.channel.send('Error finding item:' + name.replace(' ', '') + '\'s TFT information.');
+                    console.log(error);
+                });
+            }
+            else {
+                console.log("Not a valid url");
+                msg.channel.send(name + " is not a valid item (in TFT).");
+            }
+        }
+        else if(param === "trait" || param === "t"){
+            name = TextManip.fixSpecialCharacters(name, tft_traits);
+            if(tft_traits.includes(name)) {
+                console.log(name);        
+                Parser.readTrait("https://leagueoflegends.fandom.com/wiki/" + name + "_(Teamfight_Tactics)").then(value => {
+                    result = value;
+                    console.log(result);
+                    wrapText(result, msg.channel);
+                }).catch(error => {
+                    msg.channel.send('Error finding trait:' + name.replace(' ', '') + '\'s TFT information.');
+                    console.log(error);
+                });
+            }
+            else {
+                console.log("Not a valid url");
+                msg.channel.send(name + " is not a valid trait.");
+            }
+        }
+        else {
+            msg.channel.send("` " + args[0] + "` is not a valid parameter. Please try `(c)hamp, (i)tem, (t)rait`");
+        }
     }
     else {
         msg.channel.send("`!" + command + "`" + " is not a valid command. \nTry using: \n`!champ [name] [q, w, e, r, p(assive), (blank)]` \n`!item [name]` \n`!rune [name]` \n These commands are not case-sensitive.");
