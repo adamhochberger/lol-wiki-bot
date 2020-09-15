@@ -47,6 +47,15 @@ client.on('message', msg  => {
 
     offset = 0;
     
+    let name = '';
+    for(i=0; i < args.length - offset; i++) {
+        if(i===0) {name = args[i];}
+        else {name = name + "_" + args[i];}
+
+    }
+
+    name = TextManip.convertAbbreviation(name.toLowerCase());
+
     // Checks if command is for champion
     // TODO: Implement item, rune functionality
     if(command === 'champ' || command === 'stats') {
@@ -67,7 +76,7 @@ client.on('message', msg  => {
         if(args[args.length -1].length === 1) { offset = 1; param = args[args.length-1].toLowerCase()}
 
         //Builds champion name by adding all array elements - offset (since some champions require spaces)
-        let name = '';
+        name = '';
         for(i=0; i < args.length - offset; i++) {
             if(i===0) {name = args[i];}
             else {name = name + "_" + args[i];}
@@ -76,12 +85,12 @@ client.on('message', msg  => {
 
         //Converts abbreviations and adds '_' and '\'' characters where needed for URl to succeed
         name = TextManip.convertAbbreviation(name.toLowerCase());
-        name = TextManip.fixSpecialCharacters(name, champ_names);
+        name = TextManip.fixSpecialCharacters(name, champs);
 
         if(!['q', 'w', 'e', 'r', 'p', ''].includes(param) && command !== 'stats') {
             msg.channel.send("The parameter `" + args[args.length-1] + "` is not valid. Please use one of [q, w, e, r, p(assive), (blank)].")
         }
-        else if (champ_names.includes(name) === true) {
+        else if (champs.includes(name) === true) {
             //let url = "https://leagueoflegends.fandom.com/wiki/" + name + "/LoL/Gameplay";
             let result = '';
             if(command === 'stats') {
@@ -120,27 +129,22 @@ client.on('message', msg  => {
             return msg.channel.send('Please add the parameters for the command `!item [name]`');
         }
 
-        let name = '';
-        for(i=0; i < args.length - offset; i++) {
-            if(i===0) {name = args[i];}
-            else {name = name + "_" + args[i];}
+        name = TextManip.fixSpecialCharacters(name, items);
 
-        }
-
-        name = TextManip.convertAbbreviation(name.toLowerCase());
-        name = TextManip.fixSpecialCharacters(name, item_names);
-
-        if(item_names.includes(name)) {
+        if(items.includes(name)) {
             console.log(name);        
             Parser.readItem("https://leagueoflegends.fandom.com/wiki/" + name).then(value => {
                 result = value;
                 console.log(result);
                 wrapText(result, msg.channel);
+            }).catch(error => {
+                msg.channel.send('Error finding item:' + name.replace(' ', '') + ' information.');
+                console.log(error);
             });
         }
         else {
             console.log("Not a valid url");
-            msg.channel.send(name + " is not a valid item.");
+            msg.channel.send(name.replace(' ', '') + " is not a valid item.");
         }
         // printItems().then(result => {
         //     console.log(result);
