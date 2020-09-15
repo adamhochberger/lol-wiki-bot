@@ -226,7 +226,7 @@ function readItem(url) {
                 }
             });
         });
-         //Return a promise with the newly found result text
+        //Return a promise with the newly found result text
         return new Promise(resolve => {
             if (result === '') throw new Error("Item stats were not found.");
             setTimeout(() => resolve(result), 1000);
@@ -431,7 +431,45 @@ function readTFTChampion(url) {
 //Visits corresponding url and prints description and champions associated with a trait
 // urL - the fandom wiki link for the corresponding item
 function readTrait(url) {
+    result = '';
 
+    return got(url).then(response => {
+
+        const $ = cheerio.load(response.body);
+
+        $('.portable-infobox').each(function(i,e) {
+            if(i!==0) {return;}
+            result += "**" + removeTags($(this).find('h2').eq(1).text()) + "**" + "\n";
+            $(this).find('div[data-source="synergy"]').each(function(i,e) {
+                if($(this).find('.inline-block-image.tft-icon').length > 0) {
+                    result += "**Champion(s):**\n";
+                    $(this).find('.inline-block-image.tft-icon').each(function(i,e) {
+                        result += $(this).attr('data-param') + "\n";
+                    });
+                }
+                else if ($(this).find('.inline-image.tft-icon').length > 0) {
+                    result += "** Synergy item: **\n";
+                    result += removeTags($(this).find('.inline-image.tft-icon').first().attr('data-param')) + "\n";
+                }
+                else {
+                    result += "**Synergy**\n";
+                    result += removeTags($(this).find('.pi-data-value').eq(0).contents().slice(0,-1).text()) + "\n\n";
+                    if($(this).find('.pi-data-value').eq(0).find('li').length > 0){
+                        result += "**Buff:**\n";
+                        $(this).find('.pi-data-value').eq(0).find('li').each(function(i,e) {
+                            result += removeTags($(this).text()) + "\n";
+                        });
+                    }
+                }
+            });
+        });
+
+        //Return a promise with the newly found result text
+        return new Promise(resolve => {
+            if (result === '') throw new Error("Trait was not found.");
+            setTimeout(() => resolve(result), 1000);
+       });
+    });
 }
 
 
