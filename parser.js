@@ -334,9 +334,7 @@ function readAbilities(url, abilityType) {
 
                             //Appends final description text to result string 
                             result += text.substring(0, text.length) + "\n";
-
-                            //Debug console log
-                            //console.log(text.substring(0, text.length-1));
+                            
                         }
                         //For-each loop that iterates over the "rank" sections (damage, healing, etc) within the ability
                         else if($(this).is('.skill_leveling')){
@@ -357,8 +355,6 @@ function readAbilities(url, abilityType) {
                                         //Appends final description text to result string 
                                         result += text.substring(0, text.length) + "\n";
 
-                                        //Debug console log
-                                        //console.log(text.substring(0, text.length));
                                     });
 
                                     //Appends newline for formatting
@@ -375,9 +371,6 @@ function readAbilities(url, abilityType) {
 
                                 //Appends final description text to result string 
                                 result += text.substring(0, text.length) + "\n";
-
-                                //Debug console log
-                                //console.log(text.substring(0, text.length));
                             }
                             result += "\n";
 
@@ -392,72 +385,16 @@ function readAbilities(url, abilityType) {
                             if(text.trim() === '\n' || text.trim() === ' '){return;}
                             text = removeTags(text).trim();
                             result += text.substring(0, text.length);
+
                             //Appends final description text to result string 
                             if(text.charAt(text.length-1) === '.' || text.charAt(text.length-1) === '!')
                                 result += "\n";
                         }
                     });
 
-                    // //For-each loop that iterates over the "rank" sections (damage, healing, etc) within the ability
-                    // $(this).find('.skill_leveling').each(function(i,e) {
-
-                    //     //Checks if there are multiple tabs within the leveling area (more common on complex characters)
-                    //     if($(this).find('.skill-tabs').length > 0) {
-
-                    //         //For-each loop that iterates over the subtabs located within the "rank" sections
-                    //         $(this).find('.skill-tabs').each(function(i,e) {
-
-                    //             //For-each loop that prints the text and values of a skill damage/heal component
-                    //             $(this).children().each(function(i,e) {
-
-                    //                 //Removes all img src elements from the children text
-                    //                 let text = $(this).text();
-                    //                 text = removeTags(text);
-
-                    //                 //Appends final description text to result string 
-                    //                 result += text.substring(0, text.length) + "\n";
-
-                    //                 //Debug console log
-                    //                 //console.log(text.substring(0, text.length));
-                    //             });
-
-                    //             //Appends newline for formatting
-                    //             result += "\n";
-                    //         });
-                    //     }
-
-                    //     //If there are not multiple skill tabs, entirety of text is printed
-                    //     else {
-
-                    //         //Removes all img src elements from the children text
-                    //         let text = $(this).text();
-                    //         text = removeTags(text);
-
-                    //         //Appends final description text to result string 
-                    //         result += text.substring(0, text.length) + "\n";
-
-                    //         //Debug console log
-                    //         //console.log(text.substring(0, text.length));
-                    //     }
-
-                    // });
-
-                    // //For-each loop that iterates over the secondary ability info (cooldown, range, etc)
-                    // $(this).find('.ability-info').each(function(i,e) {
-                    //     //Removes all img src elements from the <p> text
-                    //     let text = $(this).text();
-                    //     text = removeTags(text);
-
-                    //     //Appends final description text to result string 
-                    //     result += text.substring(0, text.length) + "\n";
-
-                    //     //Debug console log
-                    //     //console.log(text.substring(0, text.length-1));
-
-                    // });
                 });
                 result += "\n";
-                //console.log();
+
             });
 
         });
