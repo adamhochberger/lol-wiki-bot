@@ -100,14 +100,25 @@ function readItem(url) {
     //Will display the item passive, attributes, icon potentially, and gold efficiency
     result = '';
 
+
     return got(url).then(response => {
         console.log(url);
-
+        ornnItem = false;
         const $ = cheerio.load(response.body);
 
-        //TODO: Fix formatting and ensure that titles are being properly printed
+        result += url + "\n";
+
+        //Iterates for each item on page (1 for normal item, 2 for others)
         $('.portable-infobox').each(function(i,e) {
 
+            if(i === 1) {
+                result += "\n\n================= Ornn Upgrade for Mythic =================\n\n";
+                ornnItem = true;
+            }
+            else if(i > 1) {
+                return;
+            }
+                
             //Prints item name at top of the result
             result += $(this).find('h2').contents().get(0).nodeValue + "\n\n";
 
@@ -116,7 +127,6 @@ function readItem(url) {
             $(this).find('section').each(function(i,e) {
 
                 //Skips the first tag as this is an image
-                //TODO: Implement url as part of the result so it may be displayed on Discord
                 if(i===0) {return;}
                 else if($(this).find('caption').text() === 'Availability') {return;}
                 else {
@@ -146,27 +156,29 @@ function readItem(url) {
                                 //Targets the style of table that holds the recipe information
                                 if($('table[style="border-collapse:collapse;"]').find('tbody').length > 0) {
 
+                                    //Skips the printing for an item recipe if the Ornn item is being printed as it is redundant
+                                    if(ornnItem === true) {return;}
+
                                     //Appends header to result
                                     result += "Recipe:\n"
 
                                     //Sets a spacing variable that is used for indentation
                                     spacing = '';
-                                    $('table[style="border-collapse:collapse;"]').find('tbody').each(function(i,e) {
+                                    $('table[style="border-collapse:collapse;"]').find('tbody').each(function(i,e) {                              
 
-                                        //Only uses the first table found
-                                        if(i > 0){return;}
+                                        if(i > 0 ) {return;}
 
                                         //Sets spacing to be indented since name will be printed without it and the remaining cost requires spacing
                                         spacing = '    ';
                                         result += removeTags($(this).find('.name').eq(0).text()) + " (" + 
-                                        removeTags($(this).find('.gold').find('span[style="white-space:normal;"]').eq(0).text()) + ") - \n" + spacing +
-                                        removeTags($(this).find('.gold').find('span[style="white-space:normal;"]').eq(1).text()) + " gold";
+                                        removeTags($(this).find('.gold').find('span > span[style="white-space:normal"]').eq(0).text()) + ") - \n" + spacing +
+                                        removeTags($(this).find('.gold').find('span > span[style="white-space:normal"]').eq(1).text()) + " gold";
 
                                         //Targets all remaining items with the given style
                                         $(this).find('td[rowspan="2"]').each(function(i,e) {
 
                                             //Checks if the item that has been found is advanced (has two given gold values)
-                                            if($(this).find('.gold').find('span[style="white-space:normal;"]').length > 1) {
+                                            if($(this).find('.gold').find('span > span[style="white-space:normal"]').length > 1) {
 
                                                 //Adjusts spacing so all advanced items are on the same level
                                                 if(spacing !== '    '){spacing = '    ';}
@@ -178,8 +190,8 @@ function readItem(url) {
                                                 spacing += '    ';
 
                                                 //Adds the given gold values (total cost) - (remaining cost)
-                                                result += removeTags($(this).find('.gold').find('span[style="white-space:normal;"]').eq(0).text()) + ") - \n" + spacing +
-                                                removeTags($(this).find('.gold').find('span[style="white-space:normal;"]').eq(1).text()) + " gold";
+                                                result += removeTags($(this).find('.gold').find('span > span[style="white-space:normal"]').eq(0).text()) + ") - \n" + spacing +
+                                                removeTags($(this).find('.gold').find('span > span[style="white-space:normal"]').eq(1).text()) + " gold";
                                             }
                                             else {
 
@@ -474,13 +486,13 @@ function readTrait(url) {
 function printItems() {
 
     //Normal item
-    //url = "https://leagueoflegends.fandom.com/wiki/Item";
-    //selector = '.item-icon';
+    url = "https://leagueoflegends.fandom.com/wiki/Item";
+    selector = '.item-icon';
         
     //TFT traits/champions
-    url = "https://leagueoflegends.fandom.com/wiki/Champion_(Teamfight_Tactics)";
+    //url = "https://leagueoflegends.fandom.com/wiki/Champion_(Teamfight_Tactics)";
     //selector = 'div[data-type="trait"]';
-    selector = 'div[data-type="champion"]';
+    //selector = 'div[data-type="champion"]';
 
     //TFT items
     //url = "https://leagueoflegends.fandom.com/wiki/Item_(Teamfight_Tactics)";
