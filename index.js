@@ -94,7 +94,7 @@ client.on('message', msg  => {
             //let url = "https://leagueoflegends.fandom.com/wiki/" + name + "/LoL/Gameplay";
             let result = '';
             if(command === 'stats') {
-                Parser.readStats("https://leagueoflegends.fandom.com/wiki/" + name + "/LoL/Gameplay").then(value => {
+                Parser.readStats("https://leagueoflegends.fandom.com/wiki/" + name + "/LoL").then(value => {
                     result = value;
                     console.log(result);
                     wrapText(result, msg.channel);
@@ -105,7 +105,7 @@ client.on('message', msg  => {
 
             }
             else{
-                Parser.readAbilities("https://leagueoflegends.fandom.com/wiki/" + name + "/LoL/Gameplay", param.toLowerCase()).then(value =>{
+                Parser.readAbilities("https://leagueoflegends.fandom.com/wiki/" + name + "/LoL", param.toLowerCase()).then(value =>{
                     result = value;
                     console.log(value);
                     wrapText(result, msg.channel);
