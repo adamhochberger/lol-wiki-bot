@@ -129,11 +129,39 @@ client.on('message', msg  => {
             return msg.channel.send('Please add the parameters for the command `!item [name]`');
         }
 
+        //Values that will be used to check if user wants a specific part of champion abilities
+        param = '';
+
+        //Checks if user has entered 'Ornn' and changes it to 'o'
+        if(args[args.length-1].toLowerCase() === 'ornn') {args[args.length-1] = 'o';}
+
+
+        //Sets value of parameter if the last argument is of size 1 (for ability selection)
+        if(args[args.length -1].length === 1) { offset = 1; param = args[args.length-1].toLowerCase();}
+
+        if(param === '') {
+            is_ornn_item = false;
+        }
+        else if(param !== 'o') {
+            msg.channel.send("The parameter `" + args[args.length-1] + "` is not valid. Please use one of [o, (blank)].")
+        }
+        else {
+            is_ornn_item = true;
+        }
+
+        //Builds champion name by adding all array elements - offset (since some champions require spaces)
+        name = '';
+        for(i=0; i < args.length - offset; i++) {
+            if(i===0) {name = args[i];}
+            else {name = name + "_" + args[i];}
+
+        }
+
         name = TextManip.fixSpecialCharacters(name, items);
 
         if(items.includes(name)) {
             console.log(name);        
-            Parser.readItem("https://leagueoflegends.fandom.com/wiki/" + name).then(value => {
+            Parser.readItem("https://leagueoflegends.fandom.com/wiki/" + name, is_ornn_item).then(value => {
                 result = value;
                 console.log(result);
                 wrapText(result, msg.channel);
