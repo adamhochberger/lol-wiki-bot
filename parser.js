@@ -165,9 +165,6 @@ function readItem(url, ornnItem) {
                                 //Targets the style of table that holds the recipe information
                                 if($('table[style="border-collapse:collapse;"]').find('tbody').length > 0) {
 
-                                    //Skips the printing for an item recipe if the Ornn item is being printed as it is redundant
-                                    if(ornnItem === true) {return;}
-
                                     //Appends header to result
                                     result += "Recipe:\n"
 
@@ -185,7 +182,7 @@ function readItem(url, ornnItem) {
 
                                         //Targets all remaining items with the given style
                                         $(this).find('td[rowspan="2"]').each(function(i,e) {
-
+                                            
                                             //Checks if the item that has been found is advanced (has two given gold values)
                                             if($(this).find('.gold').find('span > span[style="white-space:normal"]').length > 1) {
 
