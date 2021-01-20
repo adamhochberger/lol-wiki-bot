@@ -100,13 +100,10 @@ function readItem(url, ornnItem) {
     //Will display the item passive, attributes, icon potentially, and gold efficiency
     result = '';
 
-
     return got(url).then(response => {
         console.log(url);
-        ornnItem = false;
         const $ = cheerio.load(response.body);
-
-        result += url + "\n";
+        result += "<" + url + ">\n";
 
         //Iterates for each item on page (1 for normal item, 2 for others)
         $('.portable-infobox').each(function(i,e) {
