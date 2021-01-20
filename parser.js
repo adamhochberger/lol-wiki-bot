@@ -136,7 +136,7 @@ function readItem(url, ornnItem) {
             $(this).find('section').each(function(i,e) {
                 
                 //Skips the first tag as this is an image
-                if(i===0 || i===num_sections-1 || i===num_sections-2) {return;}
+                if(i===0 || i===num_sections-1) {return;}
                 else if($(this).find('caption').text() === 'Availability') {return;}
                 else {
 
