@@ -123,11 +123,17 @@ function readItem(url) {
             result += $(this).find('h2').contents().get(0).nodeValue + "\n\n";
 
             //Finds number of sections for use in the "Recipe" tag
+            if($(this).find('section').length > 0) {
+                num_sections = $(this).find('section').length;
+            }
+            else {
+                num_sections = 0;
+            }
 
             $(this).find('section').each(function(i,e) {
-
+                
                 //Skips the first tag as this is an image
-                if(i===0) {return;}
+                if(i===0 || i===num_sections-1 || i===num_sections-2) {return;}
                 else if($(this).find('caption').text() === 'Availability') {return;}
                 else {
 
