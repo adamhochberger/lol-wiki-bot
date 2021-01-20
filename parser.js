@@ -96,7 +96,7 @@ function readStats(url) {
 
 //Visits corresponding url and prints stats for the item along with description
 // urL - the fandom wiki link for the corresponding item
-function readItem(url) {
+function readItem(url, ornnItem) {
     //Will display the item passive, attributes, icon potentially, and gold efficiency
     result = '';
 
@@ -111,14 +111,20 @@ function readItem(url) {
         //Iterates for each item on page (1 for normal item, 2 for others)
         $('.portable-infobox').each(function(i,e) {
 
-            if(i === 1) {
-                result += "\n\n================= Ornn Upgrade for Mythic =================\n\n";
-                ornnItem = true;
+            if(ornnItem) {
+                if(i === 1) {
+                    result += "================= Ornn Upgrade for Mythic =================\n";
+                }
+                else {
+                    return;
+                }
             }
-            else if(i > 1) {
-                return;
+            else {
+                if(i >= 1) {
+                    return;
+                }
             }
-                
+            
             //Prints item name at top of the result
             result += $(this).find('h2').contents().get(0).nodeValue + "\n\n";
 
